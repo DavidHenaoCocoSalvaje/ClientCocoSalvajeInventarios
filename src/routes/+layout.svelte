@@ -36,7 +36,7 @@
 		formData.append('username', username);
 		formData.append('password', password);
 		formData.append('scope', '');
-		formData.append('client_id', '');
+		formData.append('client_id', '');	
 		formData.append('client_secret', '');
 
 		try {
@@ -75,8 +75,8 @@
 	// Puedes usar $userStore para controlar la visibilidad o mostrar información del usuario
 </script>
 
-<div class="flex w-screen h-screen items-center justify-center bg-neutral-100">
-	{#if !$userStore}
+{#if !$userStore}
+	<div class="flex w-screen h-screen items-center justify-center bg-neutral-100">
 		<form class="block" onsubmit={login}>
 			<div
 				class="flex flex-col p-6 gap-2 bg-neutral-50 w-md rounded-xl font-semibold text-xl"
@@ -105,8 +105,10 @@
 				{/if}
 			</div>
 		</form>
-	{:else}
-		<p>Bienvenido, {$userStore.username}!</p>
+	</div>
+{:else}
+	<div class="flex w-screen h-screen items-center justify-center bg-neutral-100">
+		<!-- Aquí se renderizará el contenido de la página -->
 		{@render children()}
-	{/if}
-</div>
+	</div>
+{/if}
