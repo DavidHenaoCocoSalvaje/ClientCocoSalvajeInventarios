@@ -9,6 +9,10 @@
 	let table: TableHandler<Record<string, any>> = $state(
 		new TableHandler(data.pedidos, { rowsPerPage: 20 })
 	);
+	let sort_columns = ['fecha', 'pago', 'factura numero', 'numero', 'contabilizado', 'log'];
+	let columns = $derived(
+		Object.keys(pedidos?.at(0)).map((key) => key.toLowerCase().split('_').join(' '))
+	);
 
 	async function refresh() {
 		loading = true;
@@ -20,7 +24,7 @@
 	}
 </script>
 
-<section class="sticky top-0 z-10 flex w-full flex-col items-center gap-5 bg-white px-10 pt-21">
+<section class="sticky top-0 z-10 flex w-full flex-col items-center gap-5 bg-white pt-21">
 	<h1 class="w-full text-center text-2xl font-bold">Explorador de pedidos</h1>
 	<div class="flex w-full">
 		<div class="flex w-full flex-col">
@@ -38,34 +42,28 @@
 	</div>
 </section>
 
-<div class="h-160 w-fit rounded-md border-1 px-10">
+<div class="h-165 w-full rounded-md border-1 border-gray-400 p-5">
 	{#if pedidos}
 		<Datatable basic {table}>
 			<table>
 				<thead class="bg-white!">
 					<tr>
-						<ThSort {table} field="numero">Numero</ThSort>
-						<ThSort {table} field="pago">Pago</ThSort>
-						<ThSort {table} field="factura_id">Factura ID</ThSort>
-						<ThSort {table} field="contabilizado">Contabilizado</ThSort>
-						<ThSort {table} field="log">Log</ThSort>
+						{#each sort_columns as column}
+							<ThSort {table} field={column}>{column}</ThSort>
+						{/each}
 					</tr>
 					<tr>
-						<ThFilter {table} field="numero" />
-						<ThFilter {table} field="pago" />
-						<ThFilter {table} field="factura_id" />
-						<ThFilter {table} field="contabilizado" />
-						<ThFilter {table} field="log" />
+						{#each sort_columns as column}
+							<ThFilter {table} field={column} />
+						{/each}
 					</tr>
 				</thead>
 				<tbody>
 					{#each table.rows as row}
 						<tr>
-							<td>{row.numero}</td>
-							<td>{row.pago}</td>
-							<td>{row.factura_id}</td>
-							<td>{row.contabilizado}</td>
-							<td>{row.log}</td>
+							{#each sort_columns as column}
+								<td>{row[column]}</td>
+							{/each}
 						</tr>
 					{/each}
 				</tbody>

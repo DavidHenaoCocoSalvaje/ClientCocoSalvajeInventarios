@@ -19,6 +19,6 @@
 </script>
 
 <AsideLeft root="/transacciones" {sections} />
-<div class="flex w-full flex-col items-center gap-5 overflow-hidden">
+<div class="flex w-full flex-col items-center gap-5 overflow-hidden px-10">
 	{@render children()}
 </div>
