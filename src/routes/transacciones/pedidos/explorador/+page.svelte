@@ -4,13 +4,19 @@
 
 	let { data } = $props();
 	let pedidos = $state(data.pedidos);
+	let loading = $state(false);
 
 	let table: TableHandler<Record<string, any>> = $state(
 		new TableHandler(data.pedidos, { rowsPerPage: 20 })
 	);
 
 	async function refresh() {
-		pedidos = await GetArray(data.backendUrl, '/transacciones', '/pedidos', data.access_token);
+		loading = true;
+		try {
+			pedidos = await GetArray(data.backendUrl, '/transacciones', '/pedidos', data.access_token);
+		} finally {
+			loading = false;
+		}
 	}
 </script>
 
@@ -21,12 +27,18 @@
 			<button
 				onclick={refresh}
 				class="btn cursor-pointer self-end rounded-2xl bg-teal-700 px-4 py-2 font-bold text-white"
-				>Refrescar</button>
+				disabled={loading}>
+				{#if loading}
+					Refrescando...
+				{:else}
+					Refrescar
+				{/if}
+			</button>
 		</div>
 	</div>
 </section>
 
-<div class="h-160 w-fit px-10 border-1 rounded-md">
+<div class="h-160 w-fit rounded-md border-1 px-10">
 	{#if pedidos}
 		<Datatable basic {table}>
 			<table>
