@@ -1,15 +1,48 @@
 #!/bin/bash
+# Este script construye la imagen de Docker y guarda la salida en la carpeta docker
 
-# Salir inmediatamente si un comando falla
-set -e
+# Obtener la rama actual
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
 
-# 1. Construir la aplicación SvelteKit
-echo "Construyendo la aplicación con pnpm..."
-pnpm build
+# Determinar el archivo .env y tag según la rama
+case "$BRANCH" in
+    "staging")
+        ENV_FILE=".env.staging"
+        IMAGE_TAG="staging"
+        ;;
+    "development"|"develop")
+        ENV_FILE=".env"
+        IMAGE_TAG="development"
+        ;;
+    "main"|"master"|"production")
+        ENV_FILE=".env.production"
+        IMAGE_TAG="latest"
+        ;;
+    *)
+        ENV_FILE=".env"
+        IMAGE_TAG="$BRANCH"
+        ;;
+esac
 
-# 2. Construir la imagen de Docker
-echo "Construyendo la imagen de Docker..."
-docker build . -t client-cocosalvaje
+echo "🚀 Construyendo imagen para rama: $BRANCH"
+echo "📄 Usando archivo: $ENV_FILE"
+echo "🏷️  Tag de imagen: $IMAGE_TAG"
 
-echo "Proceso completado."
-echo "Imagen creada: client-cocosalvaje:latest"
+# Verificar que existe el archivo .env
+if [ ! -f "$ENV_FILE" ]; then
+    echo "❌ Error: No se encontró $ENV_FILE"
+    exit 1
+fi
+
+# Construir la imagen
+docker build -t "integraciones-client:$IMAGE_TAG" .
+# Limipiar imagenes
+echo "🧹 Eliminando imágenes huérfanas..."
+docker image prune -f
+
+# Guardar la imagen en la carpeta build
+IMAGE_NAME="integraciones-client:$IMAGE_TAG"
+echo "💾 Guardando imagen en docker/"
+docker save "$IMAGE_NAME" -o "docker/integraciones-client-$IMAGE_TAG.tar"
+
+echo "✅ Imagen construida y guardada en docker/integraciones-client-$IMAGE_TAG.tar"

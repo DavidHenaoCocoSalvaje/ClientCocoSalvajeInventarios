@@ -1,10 +1,10 @@
 services:
   coco-salvaje-integraciones:
-    image: integraciones-client:latest
-    container_name: integraciones-client
+    image: integraciones-client:development
+    container_name: integraciones-client-development
     user: "1001:1001"
     ports:
-      - "3000:3000"
+      - "3003:3000"
     env_file:
       - .env
     restart: unless-stopped
