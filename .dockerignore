@@ -7,7 +7,6 @@ node_modules
 
 # SvelteKit build directory
 .svelte-kit
-build/
 
 # Environment variables
 .env

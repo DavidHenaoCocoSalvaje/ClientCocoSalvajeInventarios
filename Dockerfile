@@ -1,36 +1,30 @@
 # Dockerfile para cliente (frontend) de Coco Salvaje
+# PRERREQUISITO: La aplicación debe ser construida localmente (ej. con `pnpm build`) 
+# antes de construir esta imagen.
 
-# Prerrequisito: El proyecto debe ser compilado localmente antes de construir la imagen.
-# Ejecute `pnpm build` en su máquina.
-
-# Usa una imagen base oficial de node
 FROM node:trixie-slim
-
-# Establece el directorio de trabajo en el contenedor
 WORKDIR /app
 
-# Instala pnpm
-RUN npm i -g pnpm
+# Instala pnpm usando el script oficial
+RUN apt-get update && apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh - 
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="${PNPM_HOME}:${PATH}"
 
-# Copia los archivos de definición de dependencias
-COPY package.json pnpm-lock.yaml ./
-
-# Instala solo las dependencias de producción
+# Copia los archivos de dependencias e instala solo las de producción
+COPY package.json pnpm-lock.yaml ./ 
 RUN pnpm install --prod
 
-# Copia la aplicación ya construida y package.json
-COPY --chown=node:node ./build ./build
-COPY --chown=node:node ./package.json ./package.json
+# Copia la aplicación que fue compilada localmente en el directorio ./build
+COPY build/ ./
 
-# Crea un usuario no-root para ejecutar la aplicación (buena práctica de seguridad)
+# Crea el usuario 'coco' y le transfiere la propiedad de la aplicación
 RUN adduser --disabled-password --gecos '' coco && \
     chown -R coco:coco /app
 
-# Cambia al usuario no-root
+# Cambia al usuario 'coco' para la ejecución
 USER coco
 
-# Expone el puerto en el que se ejecuta la aplicación
+# Expone el puerto y define el comando de inicio
 EXPOSE 3000
-
-# El punto de entrada se define en la salida de svelte-kit build
-CMD [ "node", "build/index.js" ]
+CMD [ "node", "index.js" ]
