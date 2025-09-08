@@ -5,21 +5,22 @@
 <div class="flex h-screen w-screen items-center justify-center bg-neutral-100">
 	<form method="POST">
 		<div
-			class="flex w-md flex-col gap-2 rounded-xl bg-neutral-50 p-6 text-xl font-semibold"
-			id="login-form">
-			<label for="username">Usuario</label>
+			class="flex w-md flex-col gap-2 rounded-xl bg-neutral-50 p-6 text-xl font-semibold">
+			<label for="login-username">Usuario</label>
 			<input
 				class="rounded-md border px-4 py-2"
 				type="text"
+                id="login-username"
 				name="username"
 				placeholder="Usuario"
 				autocomplete="username"
 				required />
 
-			<label for="password">Contraseña</label>
+			<label for="login-password">Contraseña</label>
 			<input
 				class="rounded-md border px-4 py-2"
 				type="password"
+                id="login-password"
 				name="password"
 				placeholder="Contraseña"
 				autocomplete="current-password"

@@ -24,6 +24,8 @@ case "$BRANCH" in
         ;;
 esac
 
+pnpm --env-file=$ENV_FILE build
+
 echo "🚀 Construyendo imagen para rama: $BRANCH"
 echo "📄 Usando archivo: $ENV_FILE"
 echo "🏷️  Tag de imagen: $IMAGE_TAG"

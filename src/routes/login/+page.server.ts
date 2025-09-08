@@ -41,7 +41,7 @@ export const actions = {
 			cookies.set('token', accessToken, {
 				path: '/',
 				httpOnly: true,
-				secure: true,
+				secure: false, // Cuando sea true, el cookie solo se puede acceder a través de HTTPS
 				sameSite: 'strict'
 			});
 			redirect(303, redirectTo);

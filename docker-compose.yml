@@ -1,5 +1,5 @@
 services:
-  coco-salvaje-integraciones:
+  integraciones-client:
     image: integraciones-client:latest
     container_name: integraciones-client
     user: "1001:1001"
