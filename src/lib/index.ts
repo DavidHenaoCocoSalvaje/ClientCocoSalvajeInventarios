@@ -136,7 +136,7 @@ export function filterByProperties<T>(
 }
 
 export class StringUtils {
-    static capitilize(str: string, sep: string = ' ') {
-        return str.split(sep).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(sep);
+    static capitilize(str: string, sep: string = ' ', join: string = ' ') {
+        return str.split(sep).map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(join);
     }
 }

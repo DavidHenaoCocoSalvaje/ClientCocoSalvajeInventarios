@@ -10,7 +10,7 @@
 	<div class="flex flex-col gap-2">
 		{#each sections as section}
 			<button
-				class="flex w-full items-center justify-between"
+				class="flex w-full cursor-pointer items-center justify-between"
 				onclick={() => (section.open = !section.open)}>
 				{section.title}
 				<svg

@@ -5,7 +5,7 @@
 </script>
 
 {#if !page.url.pathname.startsWith('/login')}
-	<header class="fixed top-0 z-20 w-full">
+	<header class="fixed top-0 z-30 w-full">
 		<div class="flex h-16 min-w-3xs items-center gap-5 bg-teal-700 px-10 py-5 font-bold text-white">
 			<a href="/">Inicio</a>
 			<a href="/inventario">Inventario</a>

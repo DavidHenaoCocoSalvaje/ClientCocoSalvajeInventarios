@@ -18,8 +18,8 @@
 	}
 </script>
 
-<section class="sticky top-0 z-10 flex w-full flex-col items-center gap-5 bg-white pt-21">
-	<h1 class="w-full text-center text-2xl font-bold">Explorador de pedidos</h1>
+<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-16">
+	<h1 class="w-full text-center text-xl font-bold">Explorador de pedidos</h1>
 	<div class="flex w-full">
 		<div class="flex w-full flex-col">
 			<button
