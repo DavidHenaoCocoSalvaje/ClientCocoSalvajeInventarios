@@ -1,18 +1,12 @@
 <script lang="ts">
-	import { TableHandler, Datatable, ThSort, ThFilter } from '@vincjo/datatables';
 	import { GetArray } from '$lib';
+	import DataGrid from '$lib/components/DataGrid.svelte';
 
 	let { data } = $props();
-	let pedidos = $state(data.pedidos);
-	let loading = $state(false);
 
-	let table: TableHandler<Record<string, any>> = $state(
-		new TableHandler(data.pedidos, { rowsPerPage: 20 })
-	);
-	let sort_columns = ['fecha', 'pago', 'factura numero', 'numero', 'contabilizado', 'log'];
-	let columns = $derived(
-		Object.keys(pedidos?.at(0)).map((key) => key.toLowerCase().split('_').join(' '))
-	);
+	let pedidos = $state(data.pedidos);
+	let sortColumns = ['fecha', 'numero', 'pago', 'factura_numero', 'contabilizado', 'log'];
+	let loading = $state(false);
 
 	async function refresh() {
 		loading = true;
@@ -42,32 +36,6 @@
 	</div>
 </section>
 
-<div class="h-165 w-full rounded-md border-1 border-gray-400 p-5">
-	{#if pedidos}
-		<Datatable basic {table}>
-			<table>
-				<thead class="bg-white!">
-					<tr>
-						{#each sort_columns as column}
-							<ThSort {table} field={column}>{column}</ThSort>
-						{/each}
-					</tr>
-					<tr>
-						{#each sort_columns as column}
-							<ThFilter {table} field={column} />
-						{/each}
-					</tr>
-				</thead>
-				<tbody>
-					{#each table.rows as row}
-						<tr>
-							{#each sort_columns as column}
-								<td>{row[column]}</td>
-							{/each}
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</Datatable>
-	{/if}
-</div>
+{#if pedidos}
+	<DataGrid data={pedidos} columns={sortColumns} />
+{/if}

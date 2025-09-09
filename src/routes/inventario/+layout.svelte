@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Section } from '$lib/models/aside';
-	import AsideLeft from '../../components/AsideLeft.svelte';
+	import AsideLeft from '../../lib/components/AsideLeft.svelte';
 
 	let { children } = $props();
 

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Section } from '$lib/models/aside';
-	import AsideLeft from '../../components/AsideLeft.svelte';
+	import AsideLeft from '../../lib/components/AsideLeft.svelte';
 
 	let { children } = $props();
 
@@ -19,6 +19,6 @@
 </script>
 
 <AsideLeft root="/transacciones" {sections} />
-<div class="flex w-full flex-col items-center gap-5 overflow-hidden px-10">
+<div class="flex w-full flex-col items-center gap-5 overflow-x-hidden overflow-y-scroll px-10 py-5">
 	{@render children()}
 </div>
