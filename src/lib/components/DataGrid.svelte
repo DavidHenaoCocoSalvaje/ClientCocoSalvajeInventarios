@@ -11,7 +11,6 @@
 		pageSize: number;
 		page: number;
 		lastIndex: number;
-		pages: number;
 	}
 
 	let { data, columns }: Props = $props();
@@ -42,7 +41,25 @@
 		);
 	});
 
-	let cursor: Cursor = $state({ pageSize: 20, page: 1, lastIndex: 0, pages: 1 });
+	let cursor: Cursor = $state({
+		pageSize: 20,
+		page: 1,
+		lastIndex: 0
+	});
+
+	let pages = $derived.by(() => {
+		return Math.ceil(filteredData.length / cursor.pageSize);
+	});
+
+	function paginate(data: Array<Record<string, any>>, cursor: Cursor) {
+		const startIndex = (cursor.page - 1) * cursor.pageSize;
+		const endIndex = startIndex + cursor.pageSize;
+		return data.slice(startIndex, endIndex);
+	}
+
+	let paginatedData: Array<Record<string, any>> = $derived.by(() => {
+		return paginate(sortedData, cursor);
+	});
 
 	function filtrar(key: string, value: string) {
 		filtredCriteria = { ...filtredCriteria, [key]: value };
@@ -106,7 +123,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each sortedData as row, i}
+				{#each paginatedData as row, i}
 					<tr>
 						{#each dataColumns as key}
 							<td
@@ -119,14 +136,20 @@
 		</table>
 	</div>
 	<section class="flex w-full items-center justify-end gap-5 px-2">
-		<span>{cursor.page} de {cursor.pages}</span>
+		<span>{cursor.page} de {pages}</span>
 		<Button
 			action={() => {
 				if (cursor.page > 1) cursor.page--;
 			}}>Anterior</Button>
+		<input
+			class="w-12 rounded-sm border border-gray-300 px-2 py-1 font-semibold focus:outline-gray-300"
+			type="number"
+			min={cursor.page}
+			max={pages}
+			placeholder={`${cursor.page}`} />
 		<Button
 			action={() => {
-				if (cursor.page < cursor.pages) cursor.page++;
+				if (cursor.page < pages) cursor.page++;
 			}}>Siguiente</Button>
 	</section>
 </div>
