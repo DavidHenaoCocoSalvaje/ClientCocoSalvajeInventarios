@@ -124,11 +124,16 @@
 			</thead>
 			<tbody>
 				{#each paginatedData as row, i}
-					<tr>
+					<tr class="hover:bg-gray-100">
 						{#each dataColumns as key}
 							<td
-								class="max-w-40 border-gray-300 px-2 py-1 text-justify wrap-break-word"
-								class:border-t={i > 0}>{row[key]}</td>
+								class="max-w-sm overflow-hidden border-gray-300 px-2 py-1 text-justify text-nowrap"
+								class:border-t={i > 0}>
+								<button
+									ondblclick={() => {
+										navigator.clipboard.writeText(row[key]);
+									}}>{row[key]}</button>
+							</td>
 						{/each}
 					</tr>
 				{/each}

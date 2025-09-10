@@ -11,11 +11,12 @@
 	async function refresh() {
 		loading = true;
 		try {
-			pedidos = await GetArray(data.backendUrl, '/transacciones', '/pedidos', data.access_token);
+			pedidos = await GetArray(data.backendUrlCsr, '/transacciones', '/pedidos', data.access_token);
 			pedidos = pedidos.map((pedido: any) => ({
 				...pedido,
-				fecha: new Date(pedido.fecha).toLocaleDateString(),
-				factura_numero: pedido.factura_numero ? pedido.factura_numero : '-'
+				fecha: new Date(pedido.fecha).toLocaleString('es-CO'),
+				factura_numero: pedido.factura_numero ? pedido.factura_numero : '-',
+				log: pedido.log ? pedido.log : '-'
 			}));
 		} finally {
 			loading = false;

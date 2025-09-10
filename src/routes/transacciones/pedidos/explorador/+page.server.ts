@@ -8,7 +8,8 @@ export async function load({ cookies }) {
     pedidos = pedidos.map((pedido: any) => ({
         ...pedido,
         fecha: new Date(pedido.fecha).toLocaleString('es-CO'),
-        factura_numero: pedido.factura_numero ? pedido.factura_numero : '-'
+        factura_numero: pedido.factura_numero ? pedido.factura_numero : '-',
+        log: pedido.log ? pedido.log : '-'
     }));
 
     return { pedidos };
