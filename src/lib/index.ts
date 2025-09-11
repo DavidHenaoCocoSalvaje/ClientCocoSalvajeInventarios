@@ -65,6 +65,7 @@ export async function GetArray(
     const url = backendUrl + primaryRoute + path;
     const itemsReq = await fetch(url, {
         method: 'GET',
+        cache: 'no-cache',
         headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${accessToken}`
