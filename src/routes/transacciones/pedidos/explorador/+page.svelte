@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { GetArray } from '$lib';
+	import { CSRequest } from '$lib';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 
 	let { data } = $props();
@@ -11,7 +11,12 @@
 	async function refresh() {
 		loading = true;
 		try {
-			pedidos = await GetArray(data.backendUrlCsr, '/transacciones', '/pedidos', data.access_token);
+			const request = new CSRequest(data.backendUrlCsr);
+			pedidos = await request.get<Array<Record<string, any>>>(
+				'/transacciones',
+				'/pedidos',
+				data.access_token
+			);
 			pedidos = pedidos.map((pedido: any) => ({
 				...pedido,
 				fecha: new Date(pedido.fecha).toLocaleString('es-CO'),

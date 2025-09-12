@@ -1,10 +1,11 @@
 import { BACKEND_API_URL } from '$env/static/private';
-import { GetArray } from '$lib';
+import { CSRequest } from '$lib';
 
 export async function load({ cookies }) {
     const access_token = cookies.get('token') || '';
+    const request = new CSRequest(BACKEND_API_URL);
 
-    let pedidos = await GetArray(BACKEND_API_URL, '/transacciones', '/pedidos', access_token);
+    let pedidos = await request.get<Array<Record<string, any>>>('/transacciones', '/pedidos', access_token);
     pedidos = pedidos.map((pedido: any) => ({
         ...pedido,
         fecha: new Date(pedido.fecha).toLocaleString('es-CO'),

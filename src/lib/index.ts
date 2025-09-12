@@ -56,25 +56,112 @@ export class BaseObject {
     }
 }
 
-export async function GetArray(
-    backendUrl: string,
-    primaryRoute: string,
-    path: string,
-    accessToken: string
-) {
-    const url = backendUrl + primaryRoute + path;
-    const itemsReq = await fetch(url, {
-        method: 'GET',
-        cache: 'no-cache',
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`
+
+export class CSRequest {
+    constructor(
+        public backendUrl: string,
+    ) { }
+
+    private buildUrl(host: string, path: string, params: Array<string> = [], query: Record<string, string> = {}) {
+        // Asegurar que las barras estén correctamente colocadas
+        const baseUrl = this.backendUrl.endsWith('/') ? this.backendUrl.slice(0, -1) : this.backendUrl;
+        const hostPath = host.startsWith('/') ? host : '/' + host;
+        const pathPart = path.startsWith('/') ? path : '/' + path;
+
+        let url = baseUrl + hostPath + pathPart;
+
+        if (params && params.length > 0) {
+            url += '/' + params.join('/');
         }
-    });
+        if (query && Object.keys(query).length > 0) {
+            url += '?' + new URLSearchParams(query).toString();
+        }
+        return url;
+    }
 
-    const items = await itemsReq.json();
+    async request<T>(
+        method: string,
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {},
+        body: Record<string, any> | null = null
+    ): Promise<T> {
+        const url = this.buildUrl(primaryRoute, path, params, query);
+        return await fetch(url, {
+            method: method,
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: body ? JSON.stringify(body) : undefined
+        }).then(response => response.json());
+    }
 
-    return items;
+    async get<T>(
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {}
+    ): Promise<T> {
+        return this.request<T>('GET', primaryRoute, path, accessToken, params, query);
+    }
+
+    async post<T>(
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {},
+        body: Record<string, any> = {}
+    ): Promise<T> {
+        return this.request<T>('POST', primaryRoute, path, accessToken, params, query, body);
+    }
+
+    async put<T>(
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {},
+        body: Record<string, any> = {}
+    ): Promise<T> {
+        return this.request<T>('PUT', primaryRoute, path, accessToken, params, query, body);
+    }
+
+    async delete<T>(
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {}
+    ): Promise<T> {
+        return this.request<T>('DELETE', primaryRoute, path, accessToken, params, query);
+    }
+
+    async patch<T>(
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {},
+        body: Record<string, any> = {}
+    ): Promise<T> {
+        return this.request<T>('PATCH', primaryRoute, path, accessToken, params, query, body);
+    }
+
+    async options<T>(
+        primaryRoute: string,
+        path: string,
+        accessToken: string,
+        params: Array<string> = [],
+        query: Record<string, string> = {}
+    ): Promise<T> {
+        return this.request<T>('OPTIONS', primaryRoute, path, accessToken, params, query);
+    }
 }
 
 type SortDirection = 'asc' | 'desc';
