@@ -34,14 +34,6 @@
 
 	async function facturar_pendientes() {
 		const request = new CSRequest(data.backendUrlCsr);
-		const request_params = {
-			primaryRoute: '/transacciones',
-			path: '/facturar-pendientes',
-			accessToken: data.access_token,
-			params: undefined,
-			query: undefined,
-			body: {}
-		};
 		request.post('/transacciones', '/facturar-pendientes', data.access_token);
 	}
 </script>
