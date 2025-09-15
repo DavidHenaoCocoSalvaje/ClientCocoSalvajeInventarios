@@ -31,12 +31,25 @@
 			loading = false;
 		}
 	}
+
+	async function facturar_pendientes() {
+		const request = new CSRequest(data.backendUrlCsr);
+		const request_params = {
+			primaryRoute: '/transacciones',
+			path: '/facturar-pendientes',
+			accessToken: data.access_token,
+			params: undefined,
+			query: undefined,
+			body: {}
+		};
+		request.post('/transacciones', '/facturar-pendientes', data.access_token);
+	}
 </script>
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white">
 	<h1 class="w-full text-center text-lg font-bold">Explorador de pedidos</h1>
 	<div class="flex w-full justify-between">
-		<Button action={() => {}} style="bg-teal-700 text-white">Facturar pendientes</Button>
+		<Button action={facturar_pendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
 		<Button action={refresh} style="bg-teal-700 text-white">
 			{#if loading}
 				Cargando...
