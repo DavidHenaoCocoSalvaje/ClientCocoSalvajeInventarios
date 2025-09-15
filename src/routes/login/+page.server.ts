@@ -1,7 +1,6 @@
 import type { Actions } from './$types.js';
 import { BACKEND_API_URL } from '$env/static/private';
 import { redirect } from '@sveltejs/kit';
-import { GetArray } from '$lib';
 
 export const actions = {
     default: async ({ request, cookies, url }) => {
@@ -32,7 +31,7 @@ export const actions = {
                 body: formData
             });
         } catch (e) {
-            console.log(e);
+            alert(`Error al iniciar sesión: ${e}`);
         }
 
         if (res.status === 200) {

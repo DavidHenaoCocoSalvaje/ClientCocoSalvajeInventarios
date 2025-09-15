@@ -1,13 +1,12 @@
 <script lang="ts">
 	interface Props {
 		action: () => void;
-		bg?: string;
+		style?: string;
 		children?: any;
 	}
 
-	let { action, children, bg }: Props = $props();
-	bg = bg ? bg : 'bg-teal-700';
+	let { action, style, children }: Props = $props();
 </script>
 
-<button class="cursor-pointer rounded-md px-4 py-2 font-semibold text-white {bg}" onclick={action}
+<button class="w-fit cursor-pointer rounded-md px-4 py-1     {style}" onclick={action}
 	>{@render children()}</button>

@@ -104,8 +104,8 @@ export class CSRequest {
         primaryRoute: string,
         path: string,
         accessToken: string,
-        params: Array<string> = [],
-        query: Record<string, string> = {}
+        params?: Array<string>,
+        query?: Record<string, string>
     ): Promise<T> {
         return this.request<T>('GET', primaryRoute, path, accessToken, params, query);
     }

@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { CSRequest } from '$lib';
+	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
+	import { TransaccionesFormat, type Pedido } from '$lib/routes/transacciones/index.js';
 
 	let { data } = $props();
 
 	let pedidos = $state(data.pedidos);
+	let rows = $state(200);
 	let sortColumns = ['fecha', 'numero', 'pago', 'factura_numero', 'contabilizado', 'log'];
 	let loading = $state(false);
 
@@ -12,41 +15,38 @@
 		loading = true;
 		try {
 			const request = new CSRequest(data.backendUrlCsr);
-			pedidos = await request.get<Array<Record<string, any>>>(
+			pedidos = await request.get<Array<Pedido>>(
 				'/transacciones',
 				'/pedidos',
-				data.access_token
+				data.access_token,
+				undefined,
+				{
+					skip: '0',
+					limit: `${rows}`,
+					sort: 'desc'
+				}
 			);
-			pedidos = pedidos.map((pedido: any) => ({
-				...pedido,
-				fecha: new Date(pedido.fecha).toLocaleString('es-CO'),
-				factura_numero: pedido.factura_numero ? pedido.factura_numero : '-',
-				log: pedido.log ? pedido.log : '-'
-			}));
+			pedidos = TransaccionesFormat.pedidos(pedidos);
 		} finally {
 			loading = false;
 		}
 	}
 </script>
 
-<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-16">
-	<h1 class="w-full text-center text-xl font-bold">Explorador de pedidos</h1>
-	<div class="flex w-full">
-		<div class="flex w-full flex-col">
-			<button
-				onclick={refresh}
-				class="btn cursor-pointer self-end rounded-2xl bg-teal-700 px-4 py-2 font-bold text-white"
-				disabled={loading}>
-				{#if loading}
-					Refrescando...
-				{:else}
-					Refrescar
-				{/if}
-			</button>
-		</div>
+<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white">
+	<h1 class="w-full text-center text-lg font-bold">Explorador de pedidos</h1>
+	<div class="flex w-full justify-between">
+		<Button action={() => {}} style="bg-teal-700 text-white">Facturar pendientes</Button>
+		<Button action={refresh} style="bg-teal-700 text-white">
+			{#if loading}
+				Cargando...
+			{:else}
+				Refrescar
+			{/if}
+		</Button>
 	</div>
 </section>
 
 {#if pedidos}
-	<DataGrid data={pedidos} columns={sortColumns} />
+	<DataGrid data={pedidos} columns={sortColumns} bind:rows />
 {/if}

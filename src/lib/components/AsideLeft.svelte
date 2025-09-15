@@ -6,7 +6,7 @@
 
 <!-- shring-0 evita que el elemento se compima-->
 <aside
-	class="sticky top-0 left-0 h-screen w-60 shrink-0 border-r-1 border-r-gray-400 px-10 pt-21 pb-5 font-semibold">
+	class="sticky top-0 left-0 h-screen w-55 shrink-0 border-r-1 border-r-gray-400 px-10 pt-19 pb-5 font-semibold">
 	<div class="flex flex-col gap-2">
 		{#each sections as section}
 			<button

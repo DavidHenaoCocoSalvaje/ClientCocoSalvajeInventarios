@@ -5,15 +5,16 @@
 	interface Props {
 		data: Array<Record<string, any>>;
 		columns?: Array<string>;
+		rows?: number;
 	}
+
+	let { data, columns, rows = $bindable<number>() }: Props = $props();
 
 	interface Cursor {
 		pageSize: number;
 		page: number;
 		lastIndex: number;
 	}
-
-	let { data, columns }: Props = $props();
 
 	let dataColumns = $derived.by(() => {
 		if (columns && columns.length > 0) {
@@ -127,7 +128,7 @@
 					<tr class="hover:bg-gray-100">
 						{#each dataColumns as key}
 							<td
-								class="max-w-sm overflow-hidden border-gray-300 px-2 py-1 text-justify text-nowrap"
+								class="max-w-sm overflow-hidden border-gray-300 px-4 py-1 text-justify text-nowrap"
 								class:border-t={i > 0}>
 								<button
 									ondblclick={() => {
@@ -140,21 +141,50 @@
 			</tbody>
 		</table>
 	</div>
-	<section class="flex w-full items-center justify-end gap-5 px-2">
-		<span>{cursor.page} de {pages}</span>
-		<Button
-			action={() => {
-				if (cursor.page > 1) cursor.page--;
-			}}>Anterior</Button>
-		<input
-			class="w-12 rounded-sm border border-gray-300 px-2 py-1 font-semibold focus:outline-gray-300"
-			type="number"
-			min={cursor.page}
-			max={pages}
-			placeholder={`${cursor.page}`} />
-		<Button
-			action={() => {
-				if (cursor.page < pages) cursor.page++;
-			}}>Siguiente</Button>
+	<section class="flex w-full items-center justify-between gap-5 px-4">
+		<div class="flex items-center gap-5">
+			<label for="rows">Número de registros</label>
+			<input
+				id="rows"
+				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
+				type="number"
+				min="50"
+				max="1000"
+				step="50"
+				bind:value={rows}
+				placeholder={`${rows}`} />
+		</div>
+		<div class="flex items-center gap-5">
+			<label for="rows">Tamaño de página</label>
+			<input
+				id="rows"
+				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
+				type="number"
+				min="50"
+				max="1000"
+				step="50"
+				value={cursor.pageSize}
+				placeholder={`${cursor.pageSize}`} />
+		</div>
+		<div class="flex items-center gap-5">
+			<span>{cursor.page} de {pages}</span>
+			<Button
+				style="bg-teal-700 text-white"
+				action={() => {
+					if (cursor.page > 1) cursor.page--;
+				}}>Anterior</Button>
+			<input
+				class="w-12 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
+				type="number"
+				min={cursor.page}
+				max={pages}
+				value={cursor.page}
+				placeholder={`${cursor.page}`} />
+			<Button
+				style="bg-teal-700 text-white"
+				action={() => {
+					if (cursor.page < pages) cursor.page++;
+				}}>Siguiente</Button>
+		</div>
 	</section>
 </div>
