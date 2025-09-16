@@ -75,7 +75,7 @@
 
 <div class="flex w-full flex-col gap-5 rounded-md border border-gray-300 p-5">
 	<div class="h-140 w-full overflow-auto">
-		<table class="w-full text-center text-sm">
+		<table class="w-full text-center">
 			<thead class="sticky top-0 z-10 bg-white">
 				<tr>
 					{#each dataColumns as column}
@@ -148,9 +148,9 @@
 				id="rows"
 				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
-				min="50"
+				min="20"
 				max="1000"
-				step="50"
+				step="20"
 				bind:value={rows}
 				placeholder={`${rows}`} />
 		</div>
@@ -160,10 +160,10 @@
 				id="rows"
 				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
-				min="50"
+				min="20"
 				max="1000"
-				step="50"
-				value={cursor.pageSize}
+				step="20"
+				bind:value={cursor.pageSize}
 				placeholder={`${cursor.pageSize}`} />
 		</div>
 		<div class="flex items-center gap-5">

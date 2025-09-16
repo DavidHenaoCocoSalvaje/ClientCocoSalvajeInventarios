@@ -6,7 +6,7 @@
 
 {#if !page.url.pathname.startsWith('/login')}
 	<header
-		class="fixed top-0 z-30 flex h-14 w-full items-center gap-5 bg-teal-700 px-10 font-semibold text-white">
+		class="fixed top-0 z-30 flex h-14 w-full items-center gap-5 bg-teal-700 px-10 text-sm font-semibold text-white">
 		<a href="/">Inicio</a>
 		<a href="/inventario">Inventario</a>
 		<a href="/transacciones">Transacciones</a>
@@ -16,7 +16,7 @@
 	</header>
 {/if}
 
-<main class="relative flex h-screen w-screen">
+<main class="relative flex h-screen w-screen text-sm">
 	{@render children()}
 </main>
 
