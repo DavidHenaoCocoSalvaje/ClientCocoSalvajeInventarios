@@ -4,11 +4,13 @@
 
 	interface Props {
 		data: Array<Record<string, any>>;
+		refresh_data: () => Promise<void>;
 		columns?: Array<string>;
 		rows?: number;
 	}
 
-	let { data, columns, rows = $bindable<number>() }: Props = $props();
+	let { data, refresh_data, columns, rows = $bindable<number>() }: Props = $props();
+	let loading = $state(false);
 
 	interface Cursor {
 		pageSize: number;
@@ -70,6 +72,12 @@
 		sortCriteria[key] === value
 			? delete sortCriteria[key]
 			: (sortCriteria = { ...sortCriteria, [key]: value });
+	}
+
+	async function refresh() {
+		loading = true;
+		await refresh_data();
+		loading = false;
 	}
 </script>
 
@@ -153,6 +161,20 @@
 				step="20"
 				bind:value={rows}
 				placeholder={`${rows}`} />
+			<Button action={refresh} style="bg-teal-700 text-white">
+				<svg
+					class="h-5 w-5 {loading ? 'animate-spin' : ''}"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 20 20"
+					xmlns="http://www.w3.org/2000/svg">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M13.35 7.79h4.16v-.001M2.49 16.37v-4.16m0 0h4.16m-4.16 0 2.65 2.65a6.88 6.88 0 0 0 11.5-3.08M3.36 8.22a6.88 6.88 0 0 1 11.5-3.08l2.65 2.65m0-4.16v4.16" />
+				</svg>
+			</Button>
 		</div>
 		<div class="flex items-center gap-5">
 			<label for="rows">Tamaño de página</label>

@@ -12,24 +12,19 @@
 	let loading = $state(false);
 
 	async function refresh() {
-		loading = true;
-		try {
-			const request = new CSRequest(data.backendUrlCsr);
-			pedidos = await request.get<Array<Pedido>>(
-				'/transacciones',
-				'/pedidos',
-				data.access_token,
-				undefined,
-				{
-					skip: '0',
-					limit: `${rows}`,
-					sort: 'desc'
-				}
-			);
-			pedidos = TransaccionesFormat.pedidos(pedidos);
-		} finally {
-			loading = false;
-		}
+		const request = new CSRequest(data.backendUrlCsr);
+		pedidos = await request.get<Array<Pedido>>(
+			'/transacciones',
+			'/pedidos',
+			data.access_token,
+			undefined,
+			{
+				skip: '0',
+				limit: `${rows}`,
+				sort: 'desc'
+			}
+		);
+		pedidos = TransaccionesFormat.pedidos(pedidos);
 	}
 
 	async function facturar_pendientes() {
@@ -42,16 +37,9 @@
 	<h1 class="w-full text-center text-lg font-bold">Explorador de pedidos</h1>
 	<div class="flex w-full justify-between">
 		<Button action={facturar_pendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
-		<Button action={refresh} style="bg-teal-700 text-white">
-			{#if loading}
-				Cargando...
-			{:else}
-				Refrescar
-			{/if}
-		</Button>
 	</div>
 </section>
 
 {#if pedidos}
-	<DataGrid data={pedidos} columns={sortColumns} bind:rows />
+	<DataGrid data={pedidos} columns={sortColumns} bind:rows refresh_data={refresh} />
 {/if}
