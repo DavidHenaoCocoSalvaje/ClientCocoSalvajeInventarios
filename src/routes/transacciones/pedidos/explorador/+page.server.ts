@@ -1,17 +1,14 @@
 import { BACKEND_API_URL } from '$env/static/private';
-import { CSRequest } from '$lib';
-import { TransaccionesFormat, type Pedido } from '$lib/routes/transacciones/index.js';
+import { SortDirection } from '$lib';
+import { Pedido } from '$lib/routes/transacciones';
+import type { Actions } from './$types';
 
 export async function load({ cookies }) {
-    const access_token = cookies.get('token') || '';
-    const request = new CSRequest(BACKEND_API_URL);
-
-    let pedidos = await request.get<Array<Pedido>>('/transacciones', '/pedidos', access_token, undefined, {
-        skip: '0',
-        limit: '200',
-        sort: 'desc'
-    });
-    pedidos = TransaccionesFormat.pedidos(pedidos);
-
-    return { pedidos };
+	const access_token = cookies.get('token') || '';
+	const pedido = new Pedido();
+	return {
+		pedidos: await pedido.get_list(BACKEND_API_URL, access_token, 0, 200, SortDirection.DESC)
+	};
 }
+
+export const actions = {} satisfies Actions;

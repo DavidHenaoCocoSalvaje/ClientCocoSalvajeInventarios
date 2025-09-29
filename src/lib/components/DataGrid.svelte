@@ -23,7 +23,7 @@
 			return columns;
 		}
 		if (data.length > 0) {
-			return Object.keys(data[0]).map((key) => key.toUpperCase().split('_').join(' '));
+			return Object.keys(data[0]);
 		}
 		return [];
 	});
@@ -177,9 +177,9 @@
 			</Button>
 		</div>
 		<div class="flex items-center gap-5">
-			<label for="rows">Tamaño de página</label>
+			<label for="page-size">Tamaño de página</label>
 			<input
-				id="rows"
+				id="page-size"
 				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
 				min="20"

@@ -6,33 +6,31 @@
 
 	let sections: Array<Section> = $state([
 		{
-			title: 'Elementos',
-			open: false,
-			items: [
-				{
-					title: 'Explorador',
-					selected: false
-				}
-			]
-		},
-		{
-			title: 'Movimientos',
-			open: false,
-			items: [
-				{
-					title: 'Explorador',
-					selected: false
-				},
-				{
-					title: 'Saldos',
-					selected: false
-				}
-			]
-		}
+            title: 'Reportes',
+            open: false,
+            items: [
+                {
+                    title: 'Saldos',
+                    selected: false
+                }
+            ]
+        },
+        {
+            title: 'Movimientos',
+            open: false,
+            items: [
+                {
+                    title: 'Explorador',
+                    selected: false
+                }
+            ]
+        }
 	]);
 </script>
 
-<AsideLeft {sections} root="/inventario" />
-<div class="flex flex-col items-center gap-5 px-10">
+<AsideLeft root="/inventario" {sections} />
+<div
+	class="flex w-full flex-col items-center gap-5 overflow-x-hidden overflow-y-auto px-10 pt-19 pb-5">
 	{@render children()}
 </div>
+
