@@ -36,6 +36,11 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
+# Verificar/crear carpeta docker
+if [ ! -d "docker" ]; then
+    mkdir -p "docker"
+fi
+
 # Construir la imagen
 docker build -t "integraciones-client:$IMAGE_TAG" .
 # Limipiar imagenes
