@@ -5,9 +5,8 @@ import type { Actions } from './$types';
 
 export async function load({ cookies }) {
 	const access_token = cookies.get('token') || '';
-	const pedido = new Pedido();
 	return {
-		pedidos: await pedido.get_list(BACKEND_API_URL, access_token, 0, 200, SortDirection.DESC)
+		pedidos: await Pedido.get_list(BACKEND_API_URL, access_token, 0, 200, SortDirection.DESC)
 	};
 }
 

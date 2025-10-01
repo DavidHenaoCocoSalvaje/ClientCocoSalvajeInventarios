@@ -196,11 +196,12 @@
 					if (cursor.page > 1) cursor.page--;
 				}}>Anterior</Button>
 			<input
+                id="page_number"
 				class="w-12 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
-				min={cursor.page}
+				min={1}
 				max={pages}
-				value={cursor.page}
+                bind:value={cursor.page}
 				placeholder={`${cursor.page}`} />
 			<Button
 				style="bg-teal-700 text-white"

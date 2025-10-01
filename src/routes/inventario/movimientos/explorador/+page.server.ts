@@ -1,6 +1,6 @@
 import { BACKEND_API_URL } from '$env/static/private';
 import { CSRequest } from '$lib';
-import { MovimientosFormat, type IMovimiento } from '$lib/routes/Inventario/index.js';
+import { Format, type IMovimiento } from '$lib/routes/Inventario/index.js';
 
 export async function load({ cookies }) {
     const access_token = cookies.get('token') || '';
@@ -11,7 +11,7 @@ export async function load({ cookies }) {
         limit: '200',
         sort: 'desc'
     });
-    movimientos = MovimientosFormat.movimientos(movimientos);
+    movimientos = Format.movimientos(movimientos);
 
     return { movimientos };
 }

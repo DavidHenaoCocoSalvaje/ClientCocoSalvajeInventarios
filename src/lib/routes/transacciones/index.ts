@@ -1,27 +1,43 @@
-import { CSRequest, SortDirection } from '$lib';
+import { CSRequest, formatDate, SortDirection } from '$lib';
 
 interface IPedido {
-	id?: string;
-	fecha?: string;
-	numero?: number;
-	pago?: boolean;
+	id: string;
+	fecha: Date;
+	numero: number;
+	pago: boolean;
 	factura_numero?: number;
-	contabilizado?: boolean;
+	contabilizado: boolean;
 	log?: string;
-	q_intentos?: number;
+	q_intentos: number;
+}
+
+interface IPedidoFormat extends Omit<IPedido, 'fecha' | 'factura_numero'> {
+	fecha: string;
+	factura_numero: string;
+}
+
+export class TransaccionesFormat {
+	static pedidos(pedidos: Array<IPedido>): Array<IPedidoFormat> {
+		return pedidos.map((pedido: IPedido) => ({
+			...pedido,
+			fecha: formatDate(pedido.fecha, true),
+			factura_numero: pedido.factura_numero ? pedido.factura_numero.toString() : '',
+			log: pedido.log ? pedido.log : '-'
+		}));
+	}
 }
 
 export class Pedido {
-    format(pedido: IPedido) {
-        return {
-            ...pedido,
-            fecha: pedido.fecha ? new Date(pedido.fecha).toLocaleString('es-CO') : '',
-            factura_numero: pedido.factura_numero ? pedido.factura_numero.toString() : '',
-            log: pedido.log ? pedido.log : '-',
-        }
-    }
+	format(pedido: IPedido) {
+		return {
+			...pedido,
+			fecha: pedido.fecha ? new Date(pedido.fecha).toLocaleString('es-CO') : '',
+			factura_numero: pedido.factura_numero ? pedido.factura_numero.toString() : '',
+			log: pedido.log ? pedido.log : '-'
+		};
+	}
 
-	async get_list(
+	static async get_list(
 		url: string,
 		access_token: string,
 		skip: number = 0,

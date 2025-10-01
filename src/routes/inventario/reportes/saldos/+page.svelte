@@ -17,7 +17,7 @@
 	}
 </script>
 
-<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white">
+<section class="sticky top-0 pt-5 z-20 flex w-full flex-col items-center gap-5 bg-white">
 	<h1 class="w-full text-center text-lg font-bold">Saldos</h1>    
 </section>
 

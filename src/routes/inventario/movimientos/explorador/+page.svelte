@@ -2,7 +2,7 @@
 	import { CSRequest } from '$lib';
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
-	import { MovimientosFormat, type IMovimiento } from '$lib/routes/Inventario/index.js';
+	import { Format, type IMovimiento } from '$lib/routes/Inventario/index.js';
 	// import { TransaccionesFormat, type Pedido } from '$lib/routes/transacciones/index.js';
 
 	let { data } = $props();
@@ -24,7 +24,7 @@
 				sort: 'desc'
 			}
 		);
-		movimientos = MovimientosFormat.movimientos(movimientos);
+		movimientos = Format.movimientos(movimientos);
 	}
 
 	let pedido_numero = $state('');

@@ -2,17 +2,23 @@
 	import { CSRequest, SortDirection } from '$lib';
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
-	import { Pedido } from '$lib/routes/transacciones/index.js';
+	import { Pedido, TransaccionesFormat } from '$lib/routes/transacciones/index.js';
 
 	let { data } = $props();
 
 	let pedidos = $state(data.pedidos);
+	let f_pedidos = $derived(TransaccionesFormat.pedidos(pedidos));
 	let rows = $state(200);
 	let sortColumns = ['fecha', 'numero', 'pago', 'factura_numero', 'contabilizado', 'log'];
 
 	async function refresh() {
-        const pedido = new Pedido()
-		pedidos = await pedido.get_list(data.backendUrlCsr, data.access_token, 0, rows, SortDirection.DESC)
+		pedidos = await Pedido.get_list(
+			data.backendUrlCsr,
+			data.access_token,
+			0,
+			rows,
+			SortDirection.DESC
+		);
 	}
 
 	let pedido_numero = $state('');
@@ -38,7 +44,7 @@
 	}
 </script>
 
-<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white">
+<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
 	<h1 class="w-full text-center text-lg font-bold">Explorador de pedidos</h1>
 	<div class="justify-left flex w-full gap-5">
 		<Button action={facturar_pendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
@@ -53,6 +59,6 @@
 	</div>
 </section>
 
-{#if pedidos}
-	<DataGrid data={pedidos} columns={sortColumns} bind:rows refresh_data={refresh} />
+{#if f_pedidos}
+	<DataGrid data={f_pedidos} columns={sortColumns} bind:rows refresh_data={refresh} />
 {/if}
