@@ -115,14 +115,29 @@ export enum SortDirection {
 	DESC = 'desc'
 }
 
-interface SortCriterion<T> {
+export interface SortCriterion<T> {
 	key: keyof T;
-	direction?: SortDirection;
+	direction: SortDirection;
 }
 
-export function sortByProperties<T>(records: T[], criteria: SortCriterion<T>[]): T[] {
+export type SortCriteria = Record<string, SortDirection>;
+
+export function addSort(sortCriteria: SortCriteria, key: string, direction: SortDirection) {
+	if (sortCriteria[key] === direction.toLowerCase()) {
+		delete sortCriteria[key];
+	} else {
+        sortCriteria[key] = direction;
+	}
+}
+
+export function sortByProperties<T>(records: T[], sortCriteria: SortCriteria): T[] {
+	const sortCriterion = Object.entries(sortCriteria).map(([key, value]) => ({
+		key: key as keyof T,
+		direction: value
+	}));
+
 	return [...records].sort((a, b) => {
-		for (const criterion of criteria) {
+		for (const criterion of sortCriterion) {
 			const { key, direction = 'asc' } = criterion;
 			const valueA = a[key];
 			const valueB = b[key];
@@ -141,13 +156,23 @@ export function sortByProperties<T>(records: T[], criteria: SortCriterion<T>[]):
 	});
 }
 
-interface SearchCriterion<T> {
-	key: keyof T;
-	value: string; // The substring to search for.
+export type FilterCriteria = Record<string, string>;
+
+export function addFilter(filterCriteria: FilterCriteria, key: string, value: string) {
+	if (value === '') {
+		delete filterCriteria[key];
+	} else {
+		filterCriteria[key] = value;
+	}
 }
 
-export function filterByProperties<T>(records: T[], criteria: SearchCriterion<T>[]): T[] {
-	const activeCriteria = criteria.filter((c) => c.value);
+export function filterByCriteria<T>(records: T[], filterCriteria: FilterCriteria): T[] {
+	const searchCriterion = Object.entries(filterCriteria).map(([key, value]) => ({
+		key: key as keyof T,
+		value: value
+	}));
+
+	const activeCriteria = searchCriterion.filter((c) => c.value);
 
 	if (activeCriteria.length === 0) {
 		return records; // Return all records if no active criteria

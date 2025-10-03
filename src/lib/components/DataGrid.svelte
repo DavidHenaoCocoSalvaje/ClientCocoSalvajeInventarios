@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { filterByProperties, sortByProperties, StringUtils } from '$lib';
+	import { addFilter, addSort, filterByCriteria, sortByProperties, SortDirection, StringUtils, type FilterCriteria, type SortCriteria } from '$lib';
 	import Button from './Button.svelte';
 
 	interface Props {
@@ -28,19 +28,18 @@
 		return [];
 	});
 
-	let filtredCriteria: Record<string, string> = $state({});
+	let filterCriteria: FilterCriteria = $state({});
+
 	let filteredData: Array<Record<string, any>> = $derived.by(() => {
-		return filterByProperties<Record<string, any>>(
-			data,
-			Object.entries(filtredCriteria).map(([key, value]) => ({ key, value }))
-		);
+		return filterByCriteria<Record<string, any>>(data, filterCriteria);
 	});
 
-	let sortCriteria: Record<string, any> = $state({});
+	let sortCriteria: SortCriteria = $state({});
+
 	let sortedData: Array<Record<string, any>> = $derived.by(() => {
 		return sortByProperties<Record<string, any>>(
 			filteredData,
-			Object.entries(sortCriteria).map(([key, value]) => ({ key, direction: value }))
+			sortCriteria
 		);
 	});
 
@@ -64,16 +63,6 @@
 		return paginate(sortedData, cursor);
 	});
 
-	function filtrar(key: string, value: string) {
-		filtredCriteria = { ...filtredCriteria, [key]: value };
-	}
-
-	function ordenar(key: string, value: string) {
-		sortCriteria[key] === value
-			? delete sortCriteria[key]
-			: (sortCriteria = { ...sortCriteria, [key]: value });
-	}
-
 	async function refresh() {
 		loading = true;
 		await refresh_data();
@@ -91,7 +80,7 @@
 							<div class="flex w-full justify-between gap-5 px-2">
 								<span>{StringUtils.capitilize(column, '_')}</span>
 								<div class="flex gap-2">
-									<button aria-label="ascending" onclick={() => ordenar(column, 'asc')}>
+									<button aria-label="ascending" onclick={() => addSort(sortCriteria, column, SortDirection.ASC)}>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											class="h-5 w-5 cursor-pointer {sortCriteria[column] === 'asc'
@@ -102,7 +91,7 @@
 												d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
 										</svg>
 									</button>
-									<button aria-label="descending" onclick={() => ordenar(column, 'desc')}>
+									<button aria-label="descending" onclick={() => addSort(sortCriteria, column, SortDirection.DESC)}>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											class="h-5 w-5 rotate-180 transform cursor-pointer {sortCriteria[column] ===
@@ -124,9 +113,10 @@
 						<th class="content-between px-2 pb-5">
 							<input
 								type="text"
-								class="w-full rounded-sm border border-gray-300 px-2 py-1 font-normal focus:outline-gray-300"
+								class="w-full rounded-sm border border-gray-300 px-2 font-normal focus:outline-gray-300"
 								placeholder="filtro"
-								oninput={(e) => filtrar(column, (e.target as HTMLInputElement).value)} />
+								oninput={(e) =>
+									addFilter(filterCriteria, column, (e.target as HTMLInputElement).value)} />
 						</th>
 					{/each}
 				</tr>
@@ -196,12 +186,12 @@
 					if (cursor.page > 1) cursor.page--;
 				}}>Anterior</Button>
 			<input
-                id="page_number"
+				id="page_number"
 				class="w-12 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
 				min={1}
 				max={pages}
-                bind:value={cursor.page}
+				bind:value={cursor.page}
 				placeholder={`${cursor.page}`} />
 			<Button
 				style="bg-teal-700 text-white"

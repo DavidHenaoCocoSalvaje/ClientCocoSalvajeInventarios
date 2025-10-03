@@ -70,7 +70,7 @@ export class Format {
 }
 
 export class Movimiento {
-	static async get_list(
+	static async getList(
 		url: string,
 		access_token: string,
 		skip: number = 0,
@@ -91,7 +91,7 @@ export class Movimiento {
 		);
 	}
 
-	static async get_ventas(
+	static async getVentas(
 		url: string,
 		access_token: string,
 		start_date: string,
@@ -117,6 +117,18 @@ export class Movimiento {
 			}
 		);
 	}
+
+    static async getMetaValores(
+        url: string,
+        access_token: string
+    ) {
+        const request = new CSRequest(url);
+        return await request.get<Array<string>>(
+            '/inventario',
+            '/meta-valores',
+            access_token
+        )
+    }
 }
 
 export interface ISaldo {

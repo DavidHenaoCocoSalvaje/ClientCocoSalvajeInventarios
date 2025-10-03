@@ -7,10 +7,12 @@ export async function load({ cookies }) {
 	const access_token = cookies.get('token') || '';
 	const dates = startEndMonth(new Date());
 
-	const ventas = await Movimiento.get_ventas(BACKEND_API_URL, access_token, dates[0], dates[1]);
+	const ventas = await Movimiento.getVentas(BACKEND_API_URL, access_token, dates[0], dates[1]);
+    const metaValores = await Movimiento.getMetaValores(BACKEND_API_URL, access_token);
 
 	return {
-		ventas
+		ventas,
+        metaValores
 	};
 }
 
