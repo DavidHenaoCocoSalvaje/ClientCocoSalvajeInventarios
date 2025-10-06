@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { addFilter, addSort, filterByCriteria, sortByProperties, SortDirection, StringUtils, type FilterCriteria, type SortCriteria } from '$lib';
+	import { addFilter, addSort, alfanumericRandom, filterByCriteria, sortByProperties, SortDirection, StringUtils, type FilterCriteria, type SortCriteria } from '$lib';
 	import Button from './Button.svelte';
 
 	interface Props {
@@ -8,6 +8,10 @@
 		columns?: Array<string>;
 		rows?: number;
 	}
+
+    const inputRowsId = alfanumericRandom();
+    const pageSizeId = alfanumericRandom();
+    const inputPageNumberId = alfanumericRandom();
 
 	let { data, refresh_data, columns, rows = $bindable<number>() }: Props = $props();
 	let loading = $state(false);
@@ -141,9 +145,9 @@
 	</div>
 	<section class="flex w-full items-center justify-between gap-5 px-4">
 		<div class="flex items-center gap-5">
-			<label for="rows">Número de registros</label>
+			<label for={inputRowsId}>Número de registros</label>
 			<input
-				id="rows"
+				id={inputRowsId}
 				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
 				min="20"
@@ -167,9 +171,9 @@
 			</Button>
 		</div>
 		<div class="flex items-center gap-5">
-			<label for="page-size">Tamaño de página</label>
+			<label for={pageSizeId}>Tamaño de página</label>
 			<input
-				id="page-size"
+				id={pageSizeId}
 				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
 				min="20"
@@ -186,7 +190,7 @@
 					if (cursor.page > 1) cursor.page--;
 				}}>Anterior</Button>
 			<input
-				id="page_number"
+				id={inputPageNumberId}
 				class="w-12 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
 				type="number"
 				min={1}

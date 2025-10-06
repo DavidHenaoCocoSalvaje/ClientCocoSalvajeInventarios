@@ -24,7 +24,9 @@ export interface IVenta {
 	fecha: Date;
 	tipo_movimiento_id: number;
 	cantidad: number;
+    "cantidad_%": number;
 	valor: number;
+    "valor_%": number;
 	sku: string;
 	elemento_id: number;
 	variante: string;
@@ -57,6 +59,13 @@ export enum IFiltroTipoMovimiento {
 	CARGUE_INICIAL = 'cargue inicial'
 }
 
+export enum IFiltroTipoSoporte {
+    COMPRA = 'factura de compra',
+    PEDIDO = 'pedido',
+    ORDEN_PRODUCCCION = 'orden de producción',
+    TRASLADO = 'traslado'
+}
+
 export class Format {
 	static movimientos(movimientos: Array<IMovimiento>) {
 		return movimientos.map((movimiento: IMovimiento) => ({
@@ -70,7 +79,9 @@ export class Format {
 		return ventas.map((venta: IVenta) => ({
 			...venta,
 			fecha: formatDate(venta.fecha),
-			valor: formatCop(Number(venta.valor))
+			valor: formatCop(Number(venta.valor)),
+            "cantidad_%": `${venta['cantidad_%'].toFixed(2)}%`,
+            "valor_%": `${venta['valor_%'].toFixed(2)}%`
 		}));
 	}
 }
@@ -97,15 +108,30 @@ export class Movimiento {
 		);
 	}
 
-	static async getVentas(
+	static async getVentasAgrupadas(
 		url: string,
 		access_token: string,
 		start_date: string,
 		end_date: string,
 		sort: SortDirection = SortDirection.DESC,
-		frequency: IFrecuencia = IFrecuencia.DIARIO
+		frequency: IFrecuencia = IFrecuencia.DIARIO,
+        groupBy: Array<string> = ['variante_id'],
+        metaValorIds: Array<number> = []
 	) {
 		const request = new CSRequest(url);
+        let body = {}
+        if (groupBy.includes('meta_valor')) {
+            body = {
+                ...body,
+                group_by: groupBy,
+            }    
+        }
+        if (metaValorIds.length > 0) {
+            body = {
+                ...body,
+                meta_valor_ids: metaValorIds,
+            }
+        }
 		return await request.post<Array<IVenta>>(
 			'/inventario',
 			`/movimientos-agrupados`,
@@ -116,13 +142,13 @@ export class Movimiento {
 				end_date: end_date,
 				sort: sort,
 				frequency: frequency,
-				filtro_tipo_movimiento: IFiltroTipoMovimiento.SALIDA
+				filtro_tipo_movimiento: IFiltroTipoMovimiento.SALIDA,
+                filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
 			},
-			{
-				group_by: ['variante_id']
-			}
+            body
 		);
 	}
+
 
     static async getMetadatos(
         url: string,

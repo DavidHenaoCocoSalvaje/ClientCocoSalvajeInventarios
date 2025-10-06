@@ -244,3 +244,7 @@ export function startEndMonth(date: Date) {
 
 	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
 }
+
+export function alfanumericRandom(length = 16) {
+    return crypto.randomUUID().replace(/-/g, '').slice(0, length);
+}

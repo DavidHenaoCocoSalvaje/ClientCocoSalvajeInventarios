@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { addFilter, filterByCriteria, type FilterCriteria } from '$lib';
+	import { addFilter, alfanumericRandom, filterByCriteria, type FilterCriteria } from '$lib';
 
 	interface Option {
 		value: string;
@@ -17,6 +17,7 @@
 	let { options, todos, placeholderFiltro, onToogle }: Props = $props();
 	let filtredCriteria: FilterCriteria = $state({});
 	let checkAll = $state(todos);
+    const input_id = alfanumericRandom();
 
 	let filtredOptions = $derived.by(() => {
 		return filterByCriteria(options, filtredCriteria);
@@ -53,7 +54,7 @@
 	class="box-border flex w-full flex-col items-center gap-2 rounded-md border border-gray-300 p-5">
 	<div class="flex w-full items-center gap-5">
 		<input
-			id="filtro-select-box"
+            id={input_id}
 			type="text"
 			class="rounded-md border border-gray-300 px-2"
 			oninput={(e) => addFilter(filtredCriteria, 'label', (e.target as HTMLInputElement).value)}
