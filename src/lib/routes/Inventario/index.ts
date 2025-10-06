@@ -35,6 +35,12 @@ export interface IVentaFormat extends Omit<IVenta, 'valor' | 'fecha'> {
     fecha: string;
 }
 
+export interface IMetadato {
+    meta_atributo_id: number,
+    meta_valor_id: number,
+    meta_atributo: string,
+    meta_valor: string
+}
 
 export enum IFrecuencia {
 	DIARIO = 'D',
@@ -102,7 +108,7 @@ export class Movimiento {
 		const request = new CSRequest(url);
 		return await request.post<Array<IVenta>>(
 			'/inventario',
-			`/movimiento-reporte`,
+			`/movimientos-agrupados`,
 			access_token,
 			undefined,
 			{
@@ -118,15 +124,15 @@ export class Movimiento {
 		);
 	}
 
-    static async getMetaValores(
+    static async getMetadatos(
         url: string,
         access_token: string
     ) {
         const request = new CSRequest(url);
-        return await request.get<Array<string>>(
+        return await request.get<Array<IMetadato>>(
             '/inventario',
-            '/meta-valores',
-            access_token
+            '/metadatos-distinct',
+            access_token,
         )
     }
 }

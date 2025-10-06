@@ -8,11 +8,11 @@ export async function load({ cookies }) {
 	const dates = startEndMonth(new Date());
 
 	const ventas = await Movimiento.getVentas(BACKEND_API_URL, access_token, dates[0], dates[1]);
-    const metaValores = await Movimiento.getMetaValores(BACKEND_API_URL, access_token);
+    const metadatosDistinct = await Movimiento.getMetadatos(BACKEND_API_URL, access_token);
 
 	return {
 		ventas,
-        metaValores
+        metadatosDistinct,
 	};
 }
 
