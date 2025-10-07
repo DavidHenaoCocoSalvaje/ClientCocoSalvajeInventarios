@@ -126,7 +126,7 @@ export function addSort(sortCriteria: SortCriteria, key: string, direction: Sort
 	if (sortCriteria[key] === direction.toLowerCase()) {
 		delete sortCriteria[key];
 	} else {
-        sortCriteria[key] = direction;
+		sortCriteria[key] = direction;
 	}
 }
 
@@ -246,5 +246,15 @@ export function startEndMonth(date: Date) {
 }
 
 export function alfanumericRandom(length = 16) {
-    return crypto.randomUUID().replace(/-/g, '').slice(0, length);
+	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	let result = '';
+
+	for (let i = 0; i < length; i++) {
+		// Combina múltiples fuentes de aleatoriedad
+		const random = Math.random() * Date.now() * (i + 1);
+		const index = Math.floor((random % 1) * chars.length);
+		result += chars[index];
+	}
+
+	return result;
 }
