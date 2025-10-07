@@ -3,7 +3,6 @@
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import { Format, type IMovimiento } from '$lib/routes/Inventario/index.js';
-	// import { TransaccionesFormat, type Pedido } from '$lib/routes/transacciones/index.js';
 
 	let { data } = $props();
 
@@ -24,7 +23,6 @@
 				sort: 'desc'
 			}
 		);
-		movimientos = Format.movimientos(movimientos);
 	}
 
 	let pedido_numero = $state('');
@@ -66,5 +64,9 @@
 </section>
 
 {#if movimientos}
-	<DataGrid data={movimientos} columns={sortColumns} bind:rows refresh_data={refresh} />
+	<DataGrid
+		data={Format.movimientos(movimientos)}
+		columns={sortColumns}
+		bind:rows
+		refresh_data={refresh} />
 {/if}

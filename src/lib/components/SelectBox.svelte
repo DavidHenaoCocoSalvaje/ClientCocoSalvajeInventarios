@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { addFilter, alfanumericRandom, filterByCriteria, type FilterCriteria } from '$lib';
+	import InputText from './InputText.svelte';
 
 	interface Option {
 		value: string;
@@ -10,11 +11,10 @@
 	interface Props {
 		options: Option[];
 		todos: boolean;
-		placeholderFiltro?: string;
 		onToogle?: () => void;
 	}
 
-	let { options, todos, placeholderFiltro, onToogle }: Props = $props();
+	let { options, todos, onToogle }: Props = $props();
 	let filtredCriteria: FilterCriteria = $state({});
 	let checkAll = $state(todos);
     const input_id = alfanumericRandom();
@@ -53,12 +53,7 @@
 <div
 	class="box-border flex w-full flex-col items-center gap-2 rounded-md border border-gray-300 p-5">
 	<div class="flex w-full items-center gap-5">
-		<input
-            id={input_id}
-			type="text"
-			class="rounded-md border border-gray-300 px-2"
-			oninput={(e) => addFilter(filtredCriteria, 'label', (e.target as HTMLInputElement).value)}
-			placeholder={placeholderFiltro || 'filtro'} />
+        <InputText width="" placeholder="filtro" onInput={(v: string) => addFilter(filtredCriteria, 'label', v)}></InputText>
 		<button
 			class="intems-center flex w-fit cursor-pointer items-center gap-2"
 			type="button"

@@ -1,6 +1,18 @@
 <script lang="ts">
-	import { addFilter, addSort, alfanumericRandom, filterByCriteria, sortByProperties, SortDirection, StringUtils, type FilterCriteria, type SortCriteria } from '$lib';
+	import {
+		addFilter,
+		addSort,
+		alfanumericRandom,
+		filterByCriteria,
+		sortByProperties,
+		SortDirection,
+		StringUtils,
+		type FilterCriteria,
+		type SortCriteria
+	} from '$lib';
 	import Button from './Button.svelte';
+	import InputText from './InputText.svelte';
+	import RefreshSVG from './RefreshSVG.svelte';
 
 	interface Props {
 		data: Array<Record<string, any>>;
@@ -9,9 +21,9 @@
 		rows?: number;
 	}
 
-    const inputRowsId = alfanumericRandom();
-    const pageSizeId = alfanumericRandom();
-    const inputPageNumberId = alfanumericRandom();
+	const inputRowsId = alfanumericRandom();
+	const pageSizeId = alfanumericRandom();
+	const inputPageNumberId = alfanumericRandom();
 
 	let { data, refresh_data, columns, rows = $bindable<number>() }: Props = $props();
 	let loading = $state(false);
@@ -41,10 +53,7 @@
 	let sortCriteria: SortCriteria = $state({});
 
 	let sortedData: Array<Record<string, any>> = $derived.by(() => {
-		return sortByProperties<Record<string, any>>(
-			filteredData,
-			sortCriteria
-		);
+		return sortByProperties<Record<string, any>>(filteredData, sortCriteria);
 	});
 
 	let cursor: Cursor = $state({
@@ -84,7 +93,9 @@
 							<div class="flex w-full justify-between gap-5 px-2">
 								<span>{StringUtils.capitilize(column, '_')}</span>
 								<div class="flex gap-2">
-									<button aria-label="ascending" onclick={() => addSort(sortCriteria, column, SortDirection.ASC)}>
+									<button
+										aria-label="ascending"
+										onclick={() => addSort(sortCriteria, column, SortDirection.ASC)}>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											class="h-5 w-5 cursor-pointer {sortCriteria[column] === 'asc'
@@ -95,7 +106,9 @@
 												d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
 										</svg>
 									</button>
-									<button aria-label="descending" onclick={() => addSort(sortCriteria, column, SortDirection.DESC)}>
+									<button
+										aria-label="descending"
+										onclick={() => addSort(sortCriteria, column, SortDirection.DESC)}>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											class="h-5 w-5 rotate-180 transform cursor-pointer {sortCriteria[column] ===
@@ -115,12 +128,11 @@
 				<tr>
 					{#each dataColumns as column}
 						<th class="content-between px-2 pb-5">
-							<input
-								type="text"
-								class="w-full rounded-sm border border-gray-300 px-2 font-normal focus:outline-gray-300"
+							<InputText
 								placeholder="filtro"
-								oninput={(e) =>
-									addFilter(filterCriteria, column, (e.target as HTMLInputElement).value)} />
+								onInput={(v: string) => {
+									addFilter(filterCriteria, column, v);
+								}}></InputText>
 						</th>
 					{/each}
 				</tr>
@@ -156,18 +168,7 @@
 				bind:value={rows}
 				placeholder={`${rows}`} />
 			<Button action={refresh} style="bg-teal-700 text-white">
-				<svg
-					class="h-5 w-5 {loading ? 'animate-spin' : ''}"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 20 20"
-					xmlns="http://www.w3.org/2000/svg">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M13.35 7.79h4.16v-.001M2.49 16.37v-4.16m0 0h4.16m-4.16 0 2.65 2.65a6.88 6.88 0 0 0 11.5-3.08M3.36 8.22a6.88 6.88 0 0 1 11.5-3.08l2.65 2.65m0-4.16v4.16" />
-				</svg>
+				<RefreshSVG {loading}></RefreshSVG>
 			</Button>
 		</div>
 		<div class="flex items-center gap-5">

@@ -8,5 +8,5 @@
 	let { action, style, children }: Props = $props();
 </script>
 
-<button class="w-fit cursor-pointer rounded-md px-4 py-1     {style}" onclick={action}
+<button class="w-fit cursor-pointer rounded-md px-4 py-1 {style}" onclick={action}
 	>{@render children()}</button>
