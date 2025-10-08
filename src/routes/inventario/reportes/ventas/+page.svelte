@@ -3,7 +3,6 @@
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import DateRange from '$lib/components/DateRange.svelte';
-	import InputText from '$lib/components/InputText.svelte';
 	import RefreshSVG from '$lib/components/RefreshSVG.svelte';
 	import Select from '$lib/components/Select.svelte';
 	import SelectBox from '$lib/components/SelectBox.svelte';
