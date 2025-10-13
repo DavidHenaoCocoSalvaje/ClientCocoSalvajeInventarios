@@ -157,16 +157,18 @@
 	</div>
 	<section class="flex w-full items-center justify-between gap-5 px-4">
 		<div class="flex items-center gap-5">
-			<label for={inputRowsId}>Número de registros</label>
-			<input
-				id={inputRowsId}
-				class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
-				type="number"
-				min="20"
-				max="1000"
-				step="20"
-				bind:value={rows}
-				placeholder={`${rows}`} />
+            {#if rows}
+            <label for={inputRowsId}>Número de registros</label>
+                <input
+                    id={inputRowsId}
+                    class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
+                    type="number"
+                    min="20"
+                    max="1000"
+                    step="20"
+                    bind:value={rows}
+                    placeholder={`${rows}`} />
+            {/if}
 			<Button action={refresh} style="bg-teal-700 text-white">
 				<RefreshSVG {loading}></RefreshSVG>
 			</Button>

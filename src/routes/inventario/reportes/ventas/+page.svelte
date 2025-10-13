@@ -14,13 +14,15 @@
 	let ventasPorReferencia: Array<IVenta> = $state(data.ventas);
 	let ventasPorMetadato: Array<IVenta> = $state([]);
 	const defaultDates = startEndMonth(new Date());
-	let startDatePorReferencia = $state(defaultDates[0]);
-	let endDatePorReferencia = $state(defaultDates[1]);
-	let startDatePorMetadato = $state(defaultDates[0]);
-	let endDatePorMetadato = $state(defaultDates[1]);
+    let datesReference = $state({
+        startDate: defaultDates[0],
+        endDate: defaultDates[1]
+    })
+    let datesMetadato = $state({
+        startDate: defaultDates[0],
+        endDate: defaultDates[1]
+    })
 	let fVentas = $derived(Format.ventas(ventasPorReferencia));
-	let rowsDataGridReferencia = $state(200);
-	let rowsDataGridMetadato = $state(200);
     let loadingRefreshVentasPorMetadato = $state(false);
 
 	const columnsVentasPorReferencia = [
@@ -52,11 +54,12 @@
 	let frecuenciaPorMetadatoSelected = $state(IFrecuencia.DIARIO);
 
 	async function refreshVentasPorReferencia() {
+        // console.log(startDatePorReferencia, endDatePorReferencia);
 		ventasPorReferencia = await Movimiento.getVentasAgrupadas(
 			data.backendUrlCsr,
 			data.access_token,
-			startDatePorReferencia,
-			endDatePorReferencia,
+			datesReference.startDate,
+			datesReference.endDate,
 			SortDirection.DESC,
 			frecuenciaPorReferenciaSelected
 		);
@@ -65,18 +68,18 @@
 	async function refreshVentasPorMetadato() {
         loadingRefreshVentasPorMetadato = true;
 		const groupBy = ['meta_valor'];
-		const metadatoIds = optionsMetaVaroles
+		const metaValorIds = optionsMetaVaroles
 			.filter((option) => option.selected)
 			.map((option) => parseInt(option.value));
 		ventasPorMetadato = await Movimiento.getVentasAgrupadas(
 			data.backendUrlCsr,
 			data.access_token,
-			startDatePorMetadato,
-			endDatePorMetadato,
+			datesMetadato.startDate,
+			datesMetadato.endDate,
 			SortDirection.DESC,
 			frecuenciaPorMetadatoSelected,
 			groupBy,
-			metadatoIds
+			metaValorIds
 		);
         loadingRefreshVentasPorMetadato = false;
 	}
@@ -152,7 +155,7 @@
 	<section class="flex w-full flex-col gap-5">
 		<h2 class="w-full text-justify text-xl font-semibold">Ventas por referencia</h2>
 		<form action="" class="flex items-center gap-5">
-			<DateRange start_date={startDatePorReferencia} end_date={endDatePorReferencia} />
+			<DateRange dateRange={datesReference} />
 			<Select
 				options={frecuenciaOptions()}
 				label={'Frecuencia'}
@@ -161,7 +164,6 @@
 		<DataGrid
 			data={fVentas}
 			columns={columnsVentasPorReferencia}
-			bind:rows={rowsDataGridReferencia}
 			refresh_data={refreshVentasPorReferencia} />
 		<h2 class="w-full text-justify text-lg">Kpi ventas generales</h2>
 		<div class="flex w-full flex-wrap gap-5">
@@ -181,7 +183,7 @@
 	<section class="flex w-full flex-col gap-5">
 		<h2 class="w-full text-justify text-xl font-semibold">Ventas por metadato</h2>
 		<form action="" class="flex items-center gap-5">
-			<DateRange start_date={startDatePorMetadato} end_date={endDatePorMetadato} />
+			<DateRange dateRange={datesMetadato} />
 			<Select
 				options={frecuenciaOptions()}
 				label={'Frecuencia'}
@@ -206,7 +208,6 @@
                 <DataGrid
                     data={ventasPorMetadato}
                     columns={columnsVentasPorMetadato}
-                    bind:rows={rowsDataGridMetadato}
                     refresh_data={refreshVentasPorMetadato}></DataGrid>
             {/if}
         {:else if agrupacionPorMetadatoSelected == 'palabra'}

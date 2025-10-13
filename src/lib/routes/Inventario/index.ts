@@ -80,8 +80,8 @@ export class Format {
 			...venta,
 			fecha: formatDate(venta.fecha),
 			valor: formatCop(Number(venta.valor)),
-            "cantidad_%": `${venta['cantidad_%'].toFixed(2)}%`,
-            "valor_%": `${venta['valor_%'].toFixed(2)}%`
+            "cantidad_%": `${venta['cantidad_%'].toFixed(3)}%`,
+            "valor_%": `${venta['valor_%'].toFixed(3)}%`
 		}));
 	}
 }
@@ -150,9 +150,46 @@ export class Movimiento {
 	}
 
 
+    static async getVentasAgrupadasLikeMetaValor(
+		url: string,
+		access_token: string,
+		start_date: string,
+		end_date: string,
+        like_meta_valor: string,
+		sort: SortDirection = SortDirection.DESC,
+		frequency: IFrecuencia = IFrecuencia.DIARIO,
+        groupBy: Array<string> = ['variante_id'],
+	) {
+		const request = new CSRequest(url);
+        let body = {}
+        if (groupBy.includes('meta_valor')) {
+            body = {
+                ...body,
+                group_by: groupBy,
+            }    
+        }
+		return await request.post<Array<IVenta>>(
+			'/inventario',
+			`/movimientos-agrupados`,
+			access_token,
+			undefined,
+			{
+				start_date: start_date,
+				end_date: end_date,
+				sort: sort,
+                like_meta_valor: like_meta_valor,
+				frequency: frequency,
+				filtro_tipo_movimiento: IFiltroTipoMovimiento.SALIDA,
+                filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
+			},
+            body
+		);
+	}
+
+
     static async getMetadatos(
         url: string,
-        access_token: string
+        access_token: string,
     ) {
         const request = new CSRequest(url);
         return await request.get<Array<IMetadato>>(

@@ -1,10 +1,12 @@
 <script lang="ts">
     interface Props {
-        start_date: string;
-        end_date: string;
+        dateRange: {
+            startDate: string;
+            endDate: string;
+        }
     }
     
-    let { start_date, end_date }: Props = $props();
+    let { dateRange }: Props = $props();
 
 </script>
 
@@ -15,7 +17,7 @@
         id="start_date"
         name="start_date"
         class="box-border rounded-md border px-2"
-        bind:value={start_date}
+        bind:value={dateRange.startDate}
         required />
 </div>
 <div>
@@ -25,6 +27,6 @@
         id="end_date"
         name="end_date"
         class="box-border rounded-md border px-2"
-        bind:value={end_date}
+        bind:value={dateRange.endDate}
         required />
 </div>
