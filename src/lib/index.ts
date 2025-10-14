@@ -234,12 +234,23 @@ export function formatDate(date: Date, hora: boolean = false) {
 	return date.toLocaleDateString('es-CO', options);
 }
 
-export function startEndMonth(date: Date) {
+export function startEndMonthString(date: Date | string): [string, string] {
 	if (typeof date === 'string') {
 		date = new Date(date);
 	}
 
 	const start = new Date(date.getFullYear(), date.getMonth(), 1);
+	const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
+}
+
+export function yearStartAndMonthEndString(date: Date | string): [string, string] {
+	if (typeof date === 'string') {
+		date = new Date(date);
+	}
+
+	const start = new Date(date.getFullYear(), 0, 1, 0, 0, 0);
 	const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
 	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];

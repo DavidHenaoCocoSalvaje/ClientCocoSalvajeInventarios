@@ -1,29 +1,21 @@
 <script lang="ts">
-	import { formatCop, SortDirection, startEndMonth } from '$lib';
-	// import Button from '$lib/components/Button.svelte';
+	import { formatCop, SortDirection, startEndMonthString, yearStartAndMonthEndString } from '$lib';
+	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import DateRange from '$lib/components/DateRange.svelte';
 	import LineChartComponent from '$lib/components/LineChartComponent.svelte';
-	// import RefreshSVG from '$lib/components/RefreshSVG.svelte';
+	import RefreshSVG from '$lib/components/RefreshSVG.svelte';
 	import Select from '$lib/components/Select.svelte';
-	// import SelectBox from '$lib/components/SelectBox.svelte';
-	// import WordsBox from '$lib/components/WordsBox.svelte';
 	import { Format, IFrecuencia, Movimiento, type IVenta } from '$lib/routes/Inventario/index.js';
 
 	let { data } = $props();
 	let ventasPorReferencia: Array<IVenta> = $state(data.ventas);
-	// let ventasPorMetadato: Array<IVenta> = $state([]);
-	const defaultDates = startEndMonth(new Date());
-    let datesReference = $state({
-        startDate: defaultDates[0],
-        endDate: defaultDates[1]
-    })
-    // let datesMetadato = $state({
-    //     startDate: defaultDates[0],
-    //     endDate: defaultDates[1]
-    // })
-	let fVentas = $derived(Format.ventas(ventasPorReferencia));
-    // let loadingRefreshVentasPorMetadato = $state(false);
+	const defaultDatesReferencia = startEndMonthString(new Date());
+	let datesReference = $state({
+		startDate: defaultDatesReferencia[0],
+		endDate: defaultDatesReferencia[1]
+	});
+	let fVentasReferencia = $derived(Format.ventas(ventasPorReferencia));
 
 	const columnsVentasPorReferencia = [
 		'fecha',
@@ -43,18 +35,9 @@
 		}));
 	};
 
-	// const columnsVentasPorMetadato = [
-	// 	'fecha',
-	// 	'meta_valor',
-	// 	'cantidad',
-	// 	'cantidad_%',
-	// 	'valor',
-	// 	'valor_%'
-	// ];
-	// let frecuenciaPorMetadatoSelected = $state(IFrecuencia.DIARIO);
-
+	let loadingRefreshVentasPorReferencia = $state(false);
 	async function refreshVentasPorReferencia() {
-        // console.log(startDatePorReferencia, endDatePorReferencia);
+		loadingRefreshVentasPorReferencia = true;
 		ventasPorReferencia = await Movimiento.getVentasAgrupadas(
 			data.backendUrlCsr,
 			data.access_token,
@@ -63,95 +46,38 @@
 			SortDirection.DESC,
 			frecuenciaPorReferenciaSelected
 		);
+		loadingRefreshVentasPorReferencia = false;
 	}
 
-	// async function refreshVentasPorMetadato() {
-    //     loadingRefreshVentasPorMetadato = true;
-	// 	const groupBy = ['meta_valor'];
-	// 	const metaValorIds = optionsMetaVaroles
-	// 		.filter((option) => option.selected)
-	// 		.map((option) => parseInt(option.value));
-	// 	ventasPorMetadato = await Movimiento.getVentasAgrupadas(
-	// 		data.backendUrlCsr,
-	// 		data.access_token,
-	// 		datesMetadato.startDate,
-	// 		datesMetadato.endDate,
-	// 		SortDirection.DESC,
-	// 		frecuenciaPorMetadatoSelected,
-	// 		groupBy,
-	// 		metaValorIds
-	// 	);
-    //     loadingRefreshVentasPorMetadato = false;
-	// }
-
-	const metaAtributosDistinct = $derived(
-		data.metadatosDistinct.reduce(
-			(acc: Array<{ meta_atributo_id: number; meta_atributo: string }>, metadato) => {
-				if (acc.some((item) => item.meta_atributo === metadato.meta_atributo)) {
-					return acc;
-				} else {
-					acc.push(metadato);
-					return acc;
-				}
-			},
+	let historicoVentas: Array<IVenta> = $state([]);
+	let fVentasTotales = $derived(Format.ventas(historicoVentas));
+	let defaultDatesHistorico = yearStartAndMonthEndString(new Date());
+	let datesHistorico = $state({
+		startDate: defaultDatesHistorico[0],
+		endDate: defaultDatesHistorico[1]
+	});
+	let frecuencyHistoricoSelected = $state(IFrecuencia.MENSUAL);
+	let loadingRefreshHistoricoVentas = $state(false);
+	async function refreshHistoricoVentas() {
+		loadingRefreshHistoricoVentas = true;
+		historicoVentas = await Movimiento.getVentasAgrupadas(
+			data.backendUrlCsr,
+			data.access_token,
+			datesHistorico.startDate,
+			datesHistorico.endDate,
+			SortDirection.DESC,
+			frecuencyHistoricoSelected,
 			[]
-		)
-	);
-
-	function getOptionsMetaAtributos() {
-		return metaAtributosDistinct.map((metadato) => ({
-			value: String(metadato.meta_atributo_id),
-			label: metadato.meta_atributo,
-			selected: true
-		}));
+		);
+		loadingRefreshHistoricoVentas = false;
 	}
-
-    function getMetaValores() {
-        return data.metadatosDistinct.map((metadato) => metadato.meta_valor);
-    }
-
-	// const optionsMetaAtributos = $state(getOptionsMetaAtributos());
-    // const metaValores = $state(getMetaValores());
-    // let filterWordMetaValor = $state('');
-
-	// function getOptionsMetavalores() {
-	// 	const options = [];
-	// 	for (const metadato of data.metadatosDistinct) {
-	// 		if (
-	// 			optionsMetaAtributos.find(
-	// 				(option) => option.value === String(metadato.meta_atributo_id) && option.selected
-	// 			)
-	// 		) {
-	// 			options.push({
-	// 				value: String(metadato.meta_valor_id),
-	// 				label: metadato.meta_valor,
-	// 				selected: false
-	// 			});
-	// 		}
-	// 	}
-	// 	return options;
-	// }
-
-	// let optionsMetaVaroles = $state(getOptionsMetavalores());
-
-	// let agrupacionPorMetadatoSelected = $state('valor');
-	// const optionsAgrupacionMetadato = $state([
-	// 	{
-	// 		value: 'valor',
-	// 		text: 'Por valor/es'
-	// 	},
-	// 	{
-	// 		value: 'palabra',
-	// 		text: 'Por palabra'
-	// 	}
-	// ]);
 </script>
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
 	<h1 class="w-full text-center text-xl font-bold">Ventas</h1>
 </section>
 
-{#if fVentas}
+{#if fVentasReferencia}
 	<section class="flex w-full flex-col gap-5">
 		<h2 class="w-full text-justify text-xl font-semibold">Ventas por referencia</h2>
 		<form action="" class="flex items-center gap-5">
@@ -160,9 +86,12 @@
 				options={frecuenciaOptions()}
 				label={'Frecuencia'}
 				bind:value={frecuenciaPorReferenciaSelected}></Select>
+			<Button action={refreshVentasPorReferencia} style="bg-teal-700 text-white">
+				<RefreshSVG loading={loadingRefreshVentasPorReferencia}></RefreshSVG>
+			</Button>
 		</form>
 		<DataGrid
-			data={fVentas}
+			data={fVentasReferencia}
 			columns={columnsVentasPorReferencia}
 			refresh_data={refreshVentasPorReferencia} />
 		<h2 class="w-full text-justify text-lg">Kpi ventas generales</h2>
@@ -179,39 +108,29 @@
 			</div>
 		</div>
 	</section>
-    <LineChartComponent labels={[]} data={[]} title="Historico de ventas"></LineChartComponent>
-	<!-- <section class="flex w-full flex-col gap-5">
-		<h2 class="w-full text-justify text-xl font-semibold">Ventas por metadato</h2>
-		<form action="" class="flex items-center gap-5">
-			<DateRange dateRange={datesMetadato} />
-			<Select
-				options={frecuenciaOptions()}
-				label={'Frecuencia'}
-				bind:value={frecuenciaPorMetadatoSelected}></Select>
-			<Select
-				options={optionsAgrupacionMetadato}
-				label="Agrupación"
-				bind:value={agrupacionPorMetadatoSelected}></Select>
-            <Button action={refreshVentasPorMetadato} style="bg-teal-700 text-white">
-                <RefreshSVG loading={loadingRefreshVentasPorMetadato}></RefreshSVG>
-            </Button>
-		</form>
-        {#if agrupacionPorMetadatoSelected == 'valor'}
-            <SelectBox
-                options={optionsMetaAtributos}
-                todos={true}
-                onToogle={() => {
-                    optionsMetaVaroles = getOptionsMetavalores();
-                }} />
-            <SelectBox options={optionsMetaVaroles} todos={false} />
-            {#if ventasPorMetadato.length > 0}
-                <DataGrid
-                    data={ventasPorMetadato}
-                    columns={columnsVentasPorMetadato}
-                    refresh_data={refreshVentasPorMetadato}></DataGrid>
-            {/if}
-        {:else if agrupacionPorMetadatoSelected == 'palabra'}
-            <WordsBox words={metaValores} bind:filterWord={filterWordMetaValor}></WordsBox>
-        {/if}
-	</section> -->
 {/if}
+
+<section class="flex w-full flex-col gap-5">
+	<h2 class="w-full text-justify text-xl font-semibold">Historico de ventas</h2>
+	<form action="" class="flex items-center gap-5">
+		<DateRange dateRange={datesHistorico} />
+		<Select
+			options={frecuenciaOptions()}
+			label={'Frecuencia'}
+			bind:value={frecuencyHistoricoSelected}></Select>
+		<Button action={refreshHistoricoVentas} style="bg-teal-700 text-white">
+			<RefreshSVG loading={loadingRefreshHistoricoVentas}></RefreshSVG>
+		</Button>
+	</form>
+</section>
+<div class="flex w-full justify-start">
+	<LineChartComponent
+		labels={fVentasTotales.map((venta) => {
+			return venta.fecha;
+		})}
+		labelData="Ventas totales"
+		data={historicoVentas.map((venta) => {
+			return venta.valor;
+		})}
+		title="Historico de ventas"></LineChartComponent>
+</div>

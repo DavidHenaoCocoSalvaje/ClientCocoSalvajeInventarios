@@ -19,29 +19,28 @@ export interface IMovimientoFormat extends Omit<IMovimiento, 'valor' | 'fecha'> 
 	fecha: string;
 }
 
-
 export interface IVenta {
 	fecha: Date;
 	tipo_movimiento_id: number;
 	cantidad: number;
-    "cantidad_%": number;
+	'cantidad_%': number;
 	valor: number;
-    "valor_%": number;
+	'valor_%': number;
 	sku: string;
 	elemento_id: number;
 	variante: string;
 }
- 
+
 export interface IVentaFormat extends Omit<IVenta, 'valor' | 'fecha'> {
 	valor: string;
-    fecha: string;
+	fecha: string;
 }
 
 export interface IMetadato {
-    meta_atributo_id: number,
-    meta_valor_id: number,
-    meta_atributo: string,
-    meta_valor: string
+	meta_atributo_id: number;
+	meta_valor_id: number;
+	meta_atributo: string;
+	meta_valor: string;
 }
 
 export enum IFrecuencia {
@@ -60,10 +59,10 @@ export enum IFiltroTipoMovimiento {
 }
 
 export enum IFiltroTipoSoporte {
-    COMPRA = 'factura de compra',
-    PEDIDO = 'pedido',
-    ORDEN_PRODUCCCION = 'orden de producción',
-    TRASLADO = 'traslado'
+	COMPRA = 'factura de compra',
+	PEDIDO = 'pedido',
+	ORDEN_PRODUCCCION = 'orden de producción',
+	TRASLADO = 'traslado'
 }
 
 export class Format {
@@ -80,8 +79,8 @@ export class Format {
 			...venta,
 			fecha: formatDate(venta.fecha),
 			valor: formatCop(Number(venta.valor)),
-            "cantidad_%": `${venta['cantidad_%'].toFixed(3)}%`,
-            "valor_%": `${venta['valor_%'].toFixed(3)}%`
+			'cantidad_%': `${venta['cantidad_%'].toFixed(3)}%`,
+			'valor_%': `${venta['valor_%'].toFixed(3)}%`
 		}));
 	}
 }
@@ -115,23 +114,14 @@ export class Movimiento {
 		end_date: string,
 		sort: SortDirection = SortDirection.DESC,
 		frequency: IFrecuencia = IFrecuencia.DIARIO,
-        groupBy: Array<string> = ['variante_id'],
-        metaValorIds: Array<number> = []
+		groupBy: Array<string> = ['variante_id'],
+		metaValorIds: Array<number> = []
 	) {
 		const request = new CSRequest(url);
-        let body = {}
-        if (groupBy.includes('meta_valor')) {
-            body = {
-                ...body,
-                group_by: groupBy,
-            }    
-        }
-        if (metaValorIds.length > 0) {
-            body = {
-                ...body,
-                meta_valor_ids: metaValorIds,
-            }
-        }
+		const body = {
+			group_by: groupBy,
+			meta_valor_ids: metaValorIds
+		};
 		return await request.post<Array<IVenta>>(
 			'/inventario',
 			`/movimientos-agrupados`,
@@ -143,31 +133,30 @@ export class Movimiento {
 				sort: sort,
 				frequency: frequency,
 				filtro_tipo_movimiento: IFiltroTipoMovimiento.SALIDA,
-                filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
+				filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
 			},
-            body
+			body
 		);
 	}
 
-
-    static async getVentasAgrupadasLikeMetaValor(
+	static async getVentasAgrupadasLikeMetaValor(
 		url: string,
 		access_token: string,
 		start_date: string,
 		end_date: string,
-        like_meta_valor: string,
+		like_meta_valor: string,
 		sort: SortDirection = SortDirection.DESC,
 		frequency: IFrecuencia = IFrecuencia.DIARIO,
-        groupBy: Array<string> = ['variante_id'],
+		groupBy: Array<string> = ['variante_id']
 	) {
 		const request = new CSRequest(url);
-        let body = {}
-        if (groupBy.includes('meta_valor')) {
-            body = {
-                ...body,
-                group_by: groupBy,
-            }    
-        }
+		let body = {};
+		if (groupBy.includes('meta_valor')) {
+			body = {
+				...body,
+				group_by: groupBy
+			};
+		}
 		return await request.post<Array<IVenta>>(
 			'/inventario',
 			`/movimientos-agrupados`,
@@ -177,27 +166,19 @@ export class Movimiento {
 				start_date: start_date,
 				end_date: end_date,
 				sort: sort,
-                like_meta_valor: like_meta_valor,
+				like_meta_valor: like_meta_valor,
 				frequency: frequency,
 				filtro_tipo_movimiento: IFiltroTipoMovimiento.SALIDA,
-                filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
+				filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
 			},
-            body
+			body
 		);
 	}
 
-
-    static async getMetadatos(
-        url: string,
-        access_token: string,
-    ) {
-        const request = new CSRequest(url);
-        return await request.get<Array<IMetadato>>(
-            '/inventario',
-            '/metadatos-distinct',
-            access_token,
-        )
-    }
+	static async getMetadatos(url: string, access_token: string) {
+		const request = new CSRequest(url);
+		return await request.get<Array<IMetadato>>('/inventario', '/metadatos-distinct', access_token);
+	}
 }
 
 export interface ISaldo {

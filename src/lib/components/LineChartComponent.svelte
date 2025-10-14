@@ -9,7 +9,8 @@
 		Title,
 		CategoryScale,
 		Tooltip,
-		Legend
+		Legend,
+		Filler
 	} from 'chart.js';
 
 	// Registrar los módulos necesarios
@@ -21,18 +22,20 @@
 		Title,
 		CategoryScale,
 		Tooltip,
-		Legend
+		Legend,
+		Filler
 	);
 
 	// Declaramos las props usando la nueva API de Svelte 5
 	interface Props {
-        labels: string[];
+		labels: string[];
+        labelData: string;
 		data: number[];
 		color?: string;
-        title?: string;
+		title?: string;
 	}
 
-	let { labels, data, color = '#4F46E5', title = '' }: Props = $props();
+	let { labels, labelData, data, color = '#4F46E5', title = '' }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 	let chart: Chart | null = null;
@@ -46,6 +49,7 @@
 				labels,
 				datasets: [
 					{
+                        label: labelData,
 						data,
 						borderColor: color,
 						backgroundColor: `${color}33`, // color transparente
@@ -85,6 +89,6 @@
 	});
 </script>
 
-<div class="mx-auto w-full max-w-2xl rounded-2xl bg-white p-4 border border-gray-300">
+<div class="w-full max-w-3xl rounded-md border border-gray-300 bg-white p-4">
 	<canvas bind:this={canvas}></canvas>
 </div>
