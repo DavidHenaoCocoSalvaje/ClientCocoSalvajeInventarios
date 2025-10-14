@@ -1,29 +1,29 @@
 <script lang="ts">
 	import { formatCop, SortDirection, startEndMonth } from '$lib';
-	import Button from '$lib/components/Button.svelte';
+	// import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import DateRange from '$lib/components/DateRange.svelte';
-	import RefreshSVG from '$lib/components/RefreshSVG.svelte';
+	import LineChartComponent from '$lib/components/LineChartComponent.svelte';
+	// import RefreshSVG from '$lib/components/RefreshSVG.svelte';
 	import Select from '$lib/components/Select.svelte';
-	import SelectBox from '$lib/components/SelectBox.svelte';
-	import WordsBox from '$lib/components/WordsBox.svelte';
+	// import SelectBox from '$lib/components/SelectBox.svelte';
+	// import WordsBox from '$lib/components/WordsBox.svelte';
 	import { Format, IFrecuencia, Movimiento, type IVenta } from '$lib/routes/Inventario/index.js';
-	import * as echarts from 'echarts/core';
 
 	let { data } = $props();
 	let ventasPorReferencia: Array<IVenta> = $state(data.ventas);
-	let ventasPorMetadato: Array<IVenta> = $state([]);
+	// let ventasPorMetadato: Array<IVenta> = $state([]);
 	const defaultDates = startEndMonth(new Date());
     let datesReference = $state({
         startDate: defaultDates[0],
         endDate: defaultDates[1]
     })
-    let datesMetadato = $state({
-        startDate: defaultDates[0],
-        endDate: defaultDates[1]
-    })
+    // let datesMetadato = $state({
+    //     startDate: defaultDates[0],
+    //     endDate: defaultDates[1]
+    // })
 	let fVentas = $derived(Format.ventas(ventasPorReferencia));
-    let loadingRefreshVentasPorMetadato = $state(false);
+    // let loadingRefreshVentasPorMetadato = $state(false);
 
 	const columnsVentasPorReferencia = [
 		'fecha',
@@ -43,15 +43,15 @@
 		}));
 	};
 
-	const columnsVentasPorMetadato = [
-		'fecha',
-		'meta_valor',
-		'cantidad',
-		'cantidad_%',
-		'valor',
-		'valor_%'
-	];
-	let frecuenciaPorMetadatoSelected = $state(IFrecuencia.DIARIO);
+	// const columnsVentasPorMetadato = [
+	// 	'fecha',
+	// 	'meta_valor',
+	// 	'cantidad',
+	// 	'cantidad_%',
+	// 	'valor',
+	// 	'valor_%'
+	// ];
+	// let frecuenciaPorMetadatoSelected = $state(IFrecuencia.DIARIO);
 
 	async function refreshVentasPorReferencia() {
         // console.log(startDatePorReferencia, endDatePorReferencia);
@@ -65,24 +65,24 @@
 		);
 	}
 
-	async function refreshVentasPorMetadato() {
-        loadingRefreshVentasPorMetadato = true;
-		const groupBy = ['meta_valor'];
-		const metaValorIds = optionsMetaVaroles
-			.filter((option) => option.selected)
-			.map((option) => parseInt(option.value));
-		ventasPorMetadato = await Movimiento.getVentasAgrupadas(
-			data.backendUrlCsr,
-			data.access_token,
-			datesMetadato.startDate,
-			datesMetadato.endDate,
-			SortDirection.DESC,
-			frecuenciaPorMetadatoSelected,
-			groupBy,
-			metaValorIds
-		);
-        loadingRefreshVentasPorMetadato = false;
-	}
+	// async function refreshVentasPorMetadato() {
+    //     loadingRefreshVentasPorMetadato = true;
+	// 	const groupBy = ['meta_valor'];
+	// 	const metaValorIds = optionsMetaVaroles
+	// 		.filter((option) => option.selected)
+	// 		.map((option) => parseInt(option.value));
+	// 	ventasPorMetadato = await Movimiento.getVentasAgrupadas(
+	// 		data.backendUrlCsr,
+	// 		data.access_token,
+	// 		datesMetadato.startDate,
+	// 		datesMetadato.endDate,
+	// 		SortDirection.DESC,
+	// 		frecuenciaPorMetadatoSelected,
+	// 		groupBy,
+	// 		metaValorIds
+	// 	);
+    //     loadingRefreshVentasPorMetadato = false;
+	// }
 
 	const metaAtributosDistinct = $derived(
 		data.metadatosDistinct.reduce(
@@ -110,41 +110,41 @@
         return data.metadatosDistinct.map((metadato) => metadato.meta_valor);
     }
 
-	const optionsMetaAtributos = $state(getOptionsMetaAtributos());
-    const metaValores = $state(getMetaValores());
-    let filterWordMetaValor = $state('');
+	// const optionsMetaAtributos = $state(getOptionsMetaAtributos());
+    // const metaValores = $state(getMetaValores());
+    // let filterWordMetaValor = $state('');
 
-	function getOptionsMetavalores() {
-		const options = [];
-		for (const metadato of data.metadatosDistinct) {
-			if (
-				optionsMetaAtributos.find(
-					(option) => option.value === String(metadato.meta_atributo_id) && option.selected
-				)
-			) {
-				options.push({
-					value: String(metadato.meta_valor_id),
-					label: metadato.meta_valor,
-					selected: false
-				});
-			}
-		}
-		return options;
-	}
+	// function getOptionsMetavalores() {
+	// 	const options = [];
+	// 	for (const metadato of data.metadatosDistinct) {
+	// 		if (
+	// 			optionsMetaAtributos.find(
+	// 				(option) => option.value === String(metadato.meta_atributo_id) && option.selected
+	// 			)
+	// 		) {
+	// 			options.push({
+	// 				value: String(metadato.meta_valor_id),
+	// 				label: metadato.meta_valor,
+	// 				selected: false
+	// 			});
+	// 		}
+	// 	}
+	// 	return options;
+	// }
 
-	let optionsMetaVaroles = $state(getOptionsMetavalores());
+	// let optionsMetaVaroles = $state(getOptionsMetavalores());
 
-	let agrupacionPorMetadatoSelected = $state('valor');
-	const optionsAgrupacionMetadato = $state([
-		{
-			value: 'valor',
-			text: 'Por valor/es'
-		},
-		{
-			value: 'palabra',
-			text: 'Por palabra'
-		}
-	]);
+	// let agrupacionPorMetadatoSelected = $state('valor');
+	// const optionsAgrupacionMetadato = $state([
+	// 	{
+	// 		value: 'valor',
+	// 		text: 'Por valor/es'
+	// 	},
+	// 	{
+	// 		value: 'palabra',
+	// 		text: 'Por palabra'
+	// 	}
+	// ]);
 </script>
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
@@ -179,8 +179,8 @@
 			</div>
 		</div>
 	</section>
-
-	<section class="flex w-full flex-col gap-5">
+    <LineChartComponent labels={[]} data={[]} title="Historico de ventas"></LineChartComponent>
+	<!-- <section class="flex w-full flex-col gap-5">
 		<h2 class="w-full text-justify text-xl font-semibold">Ventas por metadato</h2>
 		<form action="" class="flex items-center gap-5">
 			<DateRange dateRange={datesMetadato} />
@@ -213,5 +213,5 @@
         {:else if agrupacionPorMetadatoSelected == 'palabra'}
             <WordsBox words={metaValores} bind:filterWord={filterWordMetaValor}></WordsBox>
         {/if}
-	</section>
+	</section> -->
 {/if}
