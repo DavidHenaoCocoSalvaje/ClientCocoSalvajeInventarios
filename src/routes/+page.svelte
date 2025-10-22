@@ -1,6 +1,5 @@
 <script lang="ts">
-	import ChatComponent from "$lib/components/ChatComponent.svelte";
-
+	import N8nChat from "$lib/components/N8nChat.svelte";
 </script>
 
-<ChatComponent />
+<N8nChat />

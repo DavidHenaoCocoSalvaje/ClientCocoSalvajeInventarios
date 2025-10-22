@@ -16,10 +16,10 @@
 		botName?: string;
 	}
 
-	interface N8nRequest {
+	interface N8nChatRequest {
 		sessionId: string;
-		message: string;
-		timestamp: string;
+		chatInput: string;
+		action: string;
 	}
 
 	interface N8nResponse {
@@ -28,14 +28,11 @@
 		response?: string;
 	}
 
-	const testWerbhookUrl =
-		'https://n8n.cocosalvajeapps.com/webhook-test/8e6e78ac-4ae9-4d89-8b36-827413e3e50d';
-
 	// Props con valores por defecto
 	let {
-		webhookUrl = testWerbhookUrl,
+		webhookUrl = '',
 		initialMessage = '¡Hola! ¿En qué puedo ayudarte?',
-		botName = 'Coco Sops Assistant'
+		botName = 'Assistant'
 	}: ChatProps = $props();
 
 	// Estado reactivo
@@ -82,16 +79,16 @@
 		setTimeout(() => scrollToBottom(), 100);
 
 		try {
-			const requestBody: N8nRequest = {
+			const requestBody: N8nChatRequest = {
 				sessionId: sessionId,
-				message: messageToSend,
-				timestamp: new Date().toISOString()
+				chatInput: messageToSend,
+				action: 'sendMessage'
 			};
 
 			const response = await fetch(webhookUrl, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json'
+					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify(requestBody)
 			});
@@ -203,10 +200,11 @@
 					<div class="flex {message.sender === 'user' ? 'justify-end' : 'justify-start'}">
 						<div
 							class="max-w-70 rounded-lg px-2 py-1 shadow-sm {message.sender === 'user'
-								? 'bg-teal-700 text-white'
+								? 'bg-teal-600 text-white'
 								: 'bg-white'}">
 							<p>{message.text}</p>
-							<span class="text-xs text-gray-500">{formatTime(message.timestamp)}</span>
+							<span class="text-xs {message.sender === 'user' ? 'text-white' : 'text-gray-500'}"
+								>{formatTime(message.timestamp)}</span>
 						</div>
 					</div>
 				{/each}
