@@ -65,7 +65,7 @@ export enum IFiltroTipoSoporte {
 	TRASLADO = 'traslado'
 }
 
-export class Format {
+export class InventarioFormat {
 	static movimientos(movimientos: Array<IMovimiento>) {
 		return movimientos.map((movimiento: IMovimiento) => ({
 			...movimiento,

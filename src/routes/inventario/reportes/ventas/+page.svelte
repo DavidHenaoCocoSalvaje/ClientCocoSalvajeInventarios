@@ -6,7 +6,7 @@
 	import LineChartComponent from '$lib/components/LineChartComponent.svelte';
 	import RefreshSVG from '$lib/components/RefreshSVG.svelte';
 	import Select from '$lib/components/Select.svelte';
-	import { Format, IFrecuencia, Movimiento, type IVenta } from '$lib/routes/Inventario/index.js';
+	import { InventarioFormat, IFrecuencia, Movimiento, type IVenta } from '$lib/routes/Inventario/index.js';
 
 	let { data } = $props();
 	let ventasPorReferencia: Array<IVenta> = $state(data.ventas);
@@ -15,7 +15,7 @@
 		startDate: defaultDatesReferencia[0],
 		endDate: defaultDatesReferencia[1]
 	});
-	let fVentasReferencia = $derived(Format.ventas(ventasPorReferencia));
+	let fVentasReferencia = $derived(InventarioFormat.ventas(ventasPorReferencia));
 
 	const columnsVentasPorReferencia = [
 		'fecha',
@@ -50,7 +50,7 @@
 	}
 
 	let historicoVentas: Array<IVenta> = $state([]);
-	let fVentasTotales = $derived(Format.ventas(historicoVentas));
+	let fVentasTotales = $derived(InventarioFormat.ventas(historicoVentas));
 	let defaultDatesHistorico = yearStartAndMonthEndString(new Date());
 	let datesHistorico = $state({
 		startDate: defaultDatesHistorico[0],

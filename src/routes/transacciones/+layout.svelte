@@ -7,12 +7,16 @@
 	let sections: Array<Section> = $state([
 		{
 			title: 'Pedidos',
-			open: false,
+			open: true,
 			items: [
 				{
 					title: 'Explorador',
 					selected: false
-				}
+				},
+                {
+                    title: 'Pagos Addi',
+                    selected: false
+                }
 			]
 		}
 	]);

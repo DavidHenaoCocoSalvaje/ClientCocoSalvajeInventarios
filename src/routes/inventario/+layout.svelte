@@ -7,14 +7,14 @@
 	let sections: Array<Section> = $state([
 		{
             title: 'Reportes',
-            open: false,
+            open: true,
             items: [
                 {
                     title: 'Saldos',
                     selected: false
                 },{
                     title: 'Ventas',
-                    selected: false
+                    selected: true
                 }
             ]
         },

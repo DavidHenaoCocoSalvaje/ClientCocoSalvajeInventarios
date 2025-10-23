@@ -2,6 +2,10 @@
 	import type { Section } from '$lib/models/aside';
 	import { slide } from 'svelte/transition';
 	let { sections, root }: { sections: Array<Section>; root: string } = $props();
+
+    function titleToPath(title: string) {
+        return title.replace(/\s+/g, '-').toLowerCase();
+    }
 </script>
 
 <!-- shring-0 evita que el elemento se compima-->
@@ -25,7 +29,7 @@
 				<ul class="my-2 ml-4 space-y-1" transition:slide={{ duration: 100 }}>
 					{#each section.items as item}
 						<li>
-							<a href="{root}/{section.title.toLocaleLowerCase()}/{item.title.toLocaleLowerCase()}"
+							<a href="{root}/{titleToPath(section.title)}/{titleToPath(item.title)}"
 								>{item.title}</a>
 						</li>
 					{/each}
