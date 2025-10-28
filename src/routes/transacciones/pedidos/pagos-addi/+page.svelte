@@ -1,36 +1,69 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { SubmitFunction } from '@sveltejs/kit';
-
-	// Función para manejar el envío del formulario
-	const handleSubmit: SubmitFunction = () => {
-		uploading = true;
-		message = 'Subiendo archivo...';
-		messageType = 'info';
-
-		return async ({ result, update }) => {
-			uploading = false;
-
-			if (result.type === 'success') {
-				message = '✓ Archivo subido exitosamente';
-				messageType = 'success';
-				files = undefined; // Limpiar la selección
-			} else if (result.type === 'failure') {
-				message = `✗ Error: ${result.data?.message || 'Error al subir el archivo'}`;
-				messageType = 'error';
-			} else if (result.type === 'error') {
-				message = '✗ Error inesperado al subir el archivo';
-				messageType = 'error';
-			}
-
-			await update();
-		};
-	};
+	import Title from '$lib/components/Title.svelte';
+	import Subtitle from '$lib/components/Subtitle.svelte';
+	import { alfanumericRandom, formatDate } from '$lib';
+	import imgTransaccionesAddi from '$lib/assets/images/transacciones-addi-csv.png';
+	import DataGrid from '$lib/components/DataGrid.svelte';
+	let { data } = $props();
 
 	let files = $state<FileList>();
+	const inputId = alfanumericRandom();
 	let uploading = $state(false);
 	let message = $state('');
 	let messageType = $state<'success' | 'error' | 'info'>('info');
+	let responseData = $state<any>(null);
+
+	// Función para enviar el archivo a FastAPI
+	async function handleSubmit(event: Event) {
+		event.preventDefault();
+
+		if (!files || files.length === 0) {
+			message = '✗ Por favor selecciona un archivo';
+			messageType = 'error';
+			return;
+		}
+
+		uploading = true;
+		message = 'Subiendo archivo...';
+		messageType = 'info';
+		responseData = null;
+
+		try {
+			const formData = new FormData();
+			// FastAPI espera el parámetro "files" (plural)
+			formData.append('files', files[0]);
+
+			const response = await fetch(`${data.backendUrlCsr}/transacciones/csv-addi`, {
+				method: 'POST',
+				headers: {
+					accept: 'application/json',
+					authorization: `Bearer ${data.access_token}`
+				},
+				body: formData
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(errorData.detail || `Error ${response.status}: ${response.statusText}`);
+			}
+
+			responseData = await response.json();
+            responseData.forEach((row: any) => {
+                row.fecha = formatDate(row.fecha);
+            });
+			message = '✓ Archivo procesado exitosamente';
+			messageType = 'success';
+
+			// Limpiar la selección
+			files = undefined;
+		} catch (error) {
+			console.error('Error al subir archivo:', error);
+			message = `✗ Error: ${error instanceof Error ? error.message : 'Error desconocido'}`;
+			messageType = 'error';
+		} finally {
+			uploading = false;
+		}
+	}
 
 	// Mostrar información del archivo cuando se selecciona
 	$effect(() => {
@@ -43,58 +76,69 @@
 </script>
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
-	<h1 class="w-full text-center text-lg font-bold">Pagos Addi</h1>
-	<h2 class="w-full text-lg font-semibold">Verificar forma de pago Crédito/Debito</h2>
-	<div class="mx-auto mt-8 max-w-lg rounded-lg border border-gray-200 p-8">
-		<h2 class="w-full text-2xl font-bold text-gray-800">Subir Archivo</h2>
-
-		<form method="POST" action="?/upload" enctype="multipart/form-data" use:enhance={handleSubmit}>
-			<div class="flex flex-col gap-4">
-				<div>
-					<label for="file" class="mb-2 block text-sm font-medium text-gray-700">
-						Selecciona un archivo:
-					</label>
-					<input
-						id="file"
-						name="file"
-						type="file"
-						bind:files
-						disabled={uploading}
-						required
-						class="w-full cursor-pointer rounded border-2 border-dashed border-gray-300 p-3 file:mr-4 file:rounded file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-gray-700 hover:file:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-50" />
-				</div>
-
-				{#if files && files.length > 0}
-					<div class="rounded border border-gray-200 bg-gray-50 p-3">
-						<p class="text-sm text-gray-600">
-							<span class="font-medium">Archivo:</span>
-							{files[0].name}
-						</p>
-						<p class="text-sm text-gray-600">
-							<span class="font-medium">Tamaño:</span>
-							{(files[0].size / 1024).toFixed(2)} KB
-						</p>
-					</div>
-				{/if}
-
-				<button
-					type="submit"
-					disabled={!files || uploading}
-					class="rounded bg-green-500 px-6 py-3 font-medium text-white transition-colors hover:bg-green-600 disabled:cursor-not-allowed disabled:bg-gray-300">
-					{uploading ? 'Subiendo...' : 'Subir Archivo'}
-				</button>
-			</div>
-		</form>
-
-		{#if message}
-			<div
-				class="mt-4 rounded p-4 {messageType === 'success'
-					? 'border border-green-200 bg-green-100 text-green-800'
-					: messageType === 'error'
-						? 'border border-red-200 bg-red-100 text-red-800'
-						: 'border border-blue-200 bg-blue-100 text-blue-800'}">
-				{message}
-			</div>
-		{/if}
+	<Title>Pagos Addi</Title>
+	<Subtitle>Verificar forma de pago Crédito</Subtitle>
+	<div class="w-full">
+		<p>
+			Por medio de está sección se pueden verificar cúales son las Órdenes a crédito que están relacionadas
+			con el identificador de pago proporcionado por Addi.
+		</p>
+		<p>
+			Se debe obtener el archvio CSV desde el <a
+				class="text-blue-600 hover:text-blue-800"
+				href="https://aliados.addi.com/"
+				target="_blank"
+				rel="noreferrer noopener">Portal Addi</a> (Se recomienda filtrar por fechas recientes para consultar
+			una cantidad menor de ordenes y que se procese más rápido al solicitud), y subirlo para obtener
+			el listados de órdenes correspondientes.
+		</p>
 	</div>
+	<img class="aspect-square w-md" src={imgTransaccionesAddi} alt="Transacciones Addi" />
+	<div class="flex w-full max-w-md flex-col gap-2 self-start rounded-md border border-gray-300 p-4">
+		<Subtitle>Subir archivo</Subtitle>
+		<form
+			class="flex flex-col gap-2"
+			method="POST"
+			action="?/upload"
+			enctype="multipart/form-data"
+			onsubmit={handleSubmit}>
+			<div>
+				<label
+					class="inline-block cursor-pointer rounded-md bg-teal-700 px-4 py-2 text-white"
+					for={inputId}>
+					Seleccionar archivo
+				</label>
+				<input
+					id={inputId}
+					name="file"
+					type="file"
+					bind:files
+					disabled={uploading}
+					required
+					class="h-0 w-0 opacity-0" />
+			</div>
+
+			<div class="rounded border border-gray-200 bg-gray-50 p-2">
+				<p class="text-gray-800">Archivo seleccionado:</p>
+				<p class="text-sm text-gray-600">
+					<span class="font-medium">Archivo:</span>
+					{files && files.length > 0 ? files[0].name : 'Ningún archivo seleccionado'}
+				</p>
+				<p class="text-sm text-gray-600">
+					<span class="font-medium">Tamaño:</span>
+					{files && files.length > 0 ? (files[0].size / 1024).toFixed(2) : '0'} KB
+				</p>
+			</div>
+
+			<button
+				type="submit"
+				disabled={!files || uploading}
+				class="rounded bg-teal-600 px-4 py-2 font-medium text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-gray-300">
+				{uploading ? 'Subiendo...' : 'Enviar'}
+			</button>
+		</form>
+	</div>
+    {#if responseData}
+        <DataGrid data={responseData}></DataGrid>
+    {/if}
 </section>

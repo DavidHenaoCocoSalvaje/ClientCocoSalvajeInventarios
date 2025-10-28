@@ -28,15 +28,6 @@ export class TransaccionesFormat {
 }
 
 export class Pedido {
-	format(pedido: IPedido) {
-		return {
-			...pedido,
-			fecha: pedido.fecha ? new Date(pedido.fecha).toLocaleString('es-CO') : '',
-			factura_numero: pedido.factura_numero ? pedido.factura_numero.toString() : '',
-			log: pedido.log ? pedido.log : '-'
-		};
-	}
-
 	static async get_list(
 		url: string,
 		access_token: string,

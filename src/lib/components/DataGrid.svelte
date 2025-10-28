@@ -16,7 +16,7 @@
 
 	interface Props {
 		data: Array<Record<string, any>>;
-		refresh_data: () => Promise<void>;
+		refresh_data?: () => Promise<void>;
 		columns?: Array<string>;
 		rows?: number;
 	}
@@ -77,9 +77,11 @@
 	});
 
 	async function refresh() {
-		loading = true;
-		await refresh_data();
-		loading = false;
+        if (refresh_data != undefined) {
+            loading = true;
+            await refresh_data();
+            loading = false;
+        }
 	}
 </script>
 
@@ -169,9 +171,11 @@
                     bind:value={rows}
                     placeholder={`${rows}`} />
             {/if}
-			<Button action={refresh} style="bg-teal-700 text-white">
-				<RefreshSVG {loading}></RefreshSVG>
-			</Button>
+            {#if refresh_data}
+                <Button action={refresh} style="bg-teal-700 text-white">
+                    <RefreshSVG {loading}></RefreshSVG>
+                </Button>
+            {/if}
 		</div>
 		<div class="flex items-center gap-5">
 			<label for={pageSizeId}>Tamaño de página</label>

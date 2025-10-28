@@ -1,4 +1,4 @@
-type TBody = Record<string, object | string | number | boolean | undefined | null>;
+type TBody = Record<string, object | string | number | boolean | undefined | null> | FormData;
 
 export class CSRequest {
 	constructor(public backendUrl: string) {}
@@ -94,7 +94,7 @@ export class CSRequest {
 		accessToken: string,
 		params: Array<string> = [],
 		query: Record<string, string> = {},
-		body: Record<string, undefined> = {}
+		body: TBody = {}
 	): Promise<T> {
 		return this.request<T>('PATCH', primaryRoute, path, accessToken, params, query, body);
 	}

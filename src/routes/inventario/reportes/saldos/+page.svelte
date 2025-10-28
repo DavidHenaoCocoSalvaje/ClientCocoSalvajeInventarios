@@ -2,7 +2,6 @@
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import { Slado, type ISaldo } from '$lib/routes/Inventario/index.js';
 	
-
 	let { data } = $props();
 
 	let saldos: Array<ISaldo> = $state(data.saldos);
