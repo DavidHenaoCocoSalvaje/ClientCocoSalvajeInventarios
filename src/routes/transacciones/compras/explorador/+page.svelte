@@ -22,7 +22,7 @@
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
 	<h1 class="w-full text-center text-lg font-bold">Explorador de compras</h1>
-	<h2 class="w-full text-lg font-semibold">compras facturadas</h2>
+	<h2 class="w-full text-lg font-semibold">Compras facturadas</h2>
 </section>
 
 {#if f_compras}
