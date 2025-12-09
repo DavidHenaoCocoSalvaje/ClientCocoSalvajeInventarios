@@ -11,12 +11,22 @@
 			items: [
 				{
 					title: 'Explorador',
-					selected: false
+					selected: true
 				},
-                {
-                    title: 'Pagos Addi',
-                    selected: false
-                }
+				{
+					title: 'Pagos Addi',
+					selected: false
+				}
+			]
+		},
+		{
+			title: 'Compras',
+			open: false,
+			items: [
+				{
+					title: 'Explorador',
+					selected: false
+				}
 			]
 		}
 	]);

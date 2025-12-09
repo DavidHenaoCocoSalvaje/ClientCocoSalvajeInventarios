@@ -11,7 +11,23 @@ interface IPedido {
 	q_intentos: number;
 }
 
+interface ICompra {
+	id: string;
+	fecha: Date;
+	factura_id?: number;
+	factura_numero?: number;
+	contabilizado: boolean;
+	q_intentos: number;
+	numero_factura_proveedor?: string;
+	log?: string;
+}
+
 interface IPedidoFormat extends Omit<IPedido, 'fecha' | 'factura_numero'> {
+	fecha: string;
+	factura_numero: string;
+}
+
+interface ICompraFormat extends Omit<ICompra, 'fecha' | 'factura_numero'> {
 	fecha: string;
 	factura_numero: string;
 }
@@ -23,6 +39,15 @@ export class TransaccionesFormat {
 			fecha: formatDate(pedido.fecha, true),
 			factura_numero: pedido.factura_numero ? pedido.factura_numero.toString() : '',
 			log: pedido.log ? pedido.log : '-'
+		}));
+	}
+
+	static compras(compras: Array<ICompra>): Array<ICompraFormat> {
+		return compras.map((compra: ICompra) => ({
+			...compra,
+			fecha: formatDate(compra.fecha, true),
+			factura_numero: compra.factura_numero ? compra.factura_numero.toString() : '',
+			log: compra.log ? compra.log : '-'
 		}));
 	}
 }
@@ -39,6 +64,29 @@ export class Pedido {
 		return await request.get<Array<IPedido>>(
 			'/transacciones',
 			`/pedidos`,
+			access_token,
+			undefined,
+			{
+				skip: skip.toString(),
+				limit: limit.toString(),
+				sort: sort
+			}
+		);
+	}
+}
+
+export class Compra {
+	static async get_list(
+		url: string,
+		access_token: string,
+		skip: number = 0,
+		limit: number = 100,
+		sort: SortDirection = SortDirection.DESC
+	) {
+		const request = new CSRequest(url);
+		return await request.get<Array<ICompra>>(
+			'/transacciones',
+			`/compras`,
 			access_token,
 			undefined,
 			{

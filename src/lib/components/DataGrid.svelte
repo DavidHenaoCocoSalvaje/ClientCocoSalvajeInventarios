@@ -77,11 +77,11 @@
 	});
 
 	async function refresh() {
-        if (refresh_data != undefined) {
-            loading = true;
-            await refresh_data();
-            loading = false;
-        }
+		if (refresh_data != undefined) {
+			loading = true;
+			await refresh_data();
+			loading = false;
+		}
 	}
 </script>
 
@@ -159,23 +159,23 @@
 	</div>
 	<section class="flex w-full items-center justify-between gap-5 px-4">
 		<div class="flex items-center gap-5">
-            {#if rows}
-            <label for={inputRowsId}>Número de registros</label>
-                <input
-                    id={inputRowsId}
-                    class="w-16 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
-                    type="number"
-                    min="20"
-                    max="1000"
-                    step="20"
-                    bind:value={rows}
-                    placeholder={`${rows}`} />
-            {/if}
-            {#if refresh_data}
-                <Button action={refresh} style="bg-teal-700 text-white">
-                    <RefreshSVG {loading}></RefreshSVG>
-                </Button>
-            {/if}
+			{#if rows}
+				<label for={inputRowsId}>Número de registros</label>
+				<input
+					id={inputRowsId}
+					class="w-24 rounded-sm border border-gray-300 px-2 py-1 focus:outline-gray-300"
+					type="number"
+					min="20"
+					max="1000"
+					step="20"
+					bind:value={rows}
+					placeholder={`${rows}`} />
+			{/if}
+			{#if refresh_data}
+				<Button action={refresh} style="bg-teal-700 text-white">
+					<RefreshSVG {loading}></RefreshSVG>
+				</Button>
+			{/if}
 		</div>
 		<div class="flex items-center gap-5">
 			<label for={pageSizeId}>Tamaño de página</label>
