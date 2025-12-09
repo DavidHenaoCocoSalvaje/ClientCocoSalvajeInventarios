@@ -7,7 +7,7 @@
 	let compras = $state(data.compras);
 	let f_compras = $derived(TransaccionesFormat.compras(compras));
 	let rows = $state(200);
-	let sortColumns = ['fecha', 'factura_numero', 'contabilizado', 'log'];
+	let sortColumns = ['fecha', 'numero_factura_proveedor', 'factura_numero', 'contabilizado', 'log'];
 
 	async function refresh() {
 		compras = await Compra.get_list(
@@ -18,7 +18,6 @@
 			SortDirection.DESC
 		);
 	}
-
 </script>
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">

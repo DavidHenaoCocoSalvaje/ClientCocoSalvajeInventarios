@@ -10,6 +10,7 @@
 		type FilterCriteria,
 		type SortCriteria
 	} from '$lib';
+	import Modal from './Modal.svelte';
 	import Button from './Button.svelte';
 	import InputText from './InputText.svelte';
 	import RefreshSVG from './RefreshSVG.svelte';
@@ -27,6 +28,8 @@
 
 	let { data, refresh_data, columns, rows = $bindable<number>() }: Props = $props();
 	let loading = $state(false);
+	let showModal = $state(false);
+	let modalContent = $state('');
 
 	interface Cursor {
 		pageSize: number;
@@ -84,6 +87,12 @@
 		}
 	}
 </script>
+
+<Modal bind:showModal>
+	<p class="text-justify text-gray-600">
+		{modalContent}
+	</p>
+</Modal>
 
 <div class="flex w-full flex-col gap-5 rounded-md border border-gray-300 p-5">
 	<div class="h-140 w-full overflow-auto">
@@ -147,8 +156,10 @@
 								class="max-w-sm overflow-hidden border-gray-300 px-4 py-1 text-justify text-nowrap"
 								class:border-t={i > 0}>
 								<button
+									class="w-full text-start"
 									ondblclick={() => {
-										navigator.clipboard.writeText(row[key]);
+										modalContent = row[key];
+										showModal = true;
 									}}>{row[key]}</button>
 							</td>
 						{/each}

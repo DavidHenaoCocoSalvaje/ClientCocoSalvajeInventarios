@@ -27,3 +27,6 @@ docker/
 
 # Ansible
 .ansible/
+
+# AI
+.agent/
