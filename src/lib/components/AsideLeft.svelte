@@ -3,9 +3,9 @@
 	import { slide } from 'svelte/transition';
 	let { sections, root }: { sections: Array<Section>; root: string } = $props();
 
-    function titleToPath(title: string) {
-        return title.replace(/\s+/g, '-').toLowerCase();
-    }
+	function titleToPath(title: string) {
+		return title.replace(/\s+/g, '-').toLowerCase();
+	}
 </script>
 
 <!-- shring-0 evita que el elemento se compima-->
@@ -14,7 +14,7 @@
 	<div class="flex flex-col gap-2">
 		{#each sections as section}
 			<button
-				class="flex w-full cursor-pointer items-center justify-between"
+				class="flex w-full cursor-pointer items-center justify-between transition-colors duration-200 hover:text-teal-700"
 				onclick={() => (section.open = !section.open)}>
 				{section.title}
 				<svg
@@ -29,7 +29,9 @@
 				<ul class="my-2 ml-4 space-y-1" transition:slide={{ duration: 100 }}>
 					{#each section.items as item}
 						<li>
-							<a href="{root}/{titleToPath(section.title)}/{titleToPath(item.title)}"
+							<a
+								class="transition-colors duration-200 hover:text-teal-600"
+								href="{root}/{titleToPath(section.title)}/{titleToPath(item.title)}"
 								>{item.title}</a>
 						</li>
 					{/each}

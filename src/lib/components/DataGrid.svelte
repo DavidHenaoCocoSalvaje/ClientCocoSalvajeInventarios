@@ -183,7 +183,9 @@
 					placeholder={`${rows}`} />
 			{/if}
 			{#if refresh_data}
-				<Button action={refresh} style="bg-teal-700 text-white">
+				<Button
+					action={refresh}
+					style="bg-teal-700 text-white transition-colors duration-200 hover:bg-teal-800">
 					<RefreshSVG {loading}></RefreshSVG>
 				</Button>
 			{/if}
