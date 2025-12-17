@@ -50,7 +50,7 @@
 		<Button action={facturar_pendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
 		<label for="facturar_pedido"></label>
 		<input
-			class="rounded-sm border border-gray-300 px-2 py-1 font-normal focus:outline-gray-300"
+			class="rounded-sm border border-gray-300 px-2 py-1 font-normal transition-colors duration-200 hover:border-teal-500 focus:border-teal-500 focus:outline-none"
 			id="facturar_pedido"
 			type="text"
 			placeholder="Número de pedido"
