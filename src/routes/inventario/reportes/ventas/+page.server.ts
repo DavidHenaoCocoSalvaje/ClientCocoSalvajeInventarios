@@ -7,12 +7,17 @@ export async function load({ cookies }) {
 	const access_token = cookies.get('token') || '';
 	const dates = startEndMonthString(new Date());
 
-	const ventas = await Movimiento.getVentasAgrupadas(BACKEND_API_URL, access_token, dates[0], dates[1]);
-    const metadatosDistinct = await Movimiento.getMetadatos(BACKEND_API_URL, access_token);
+	const ventas = await Movimiento.getVentasAgrupadas({
+		url: BACKEND_API_URL,
+		access_token,
+		start_date: dates[0],
+		end_date: dates[1]
+	});
+	const metadatosDistinct = await Movimiento.getMetadatos({ url: BACKEND_API_URL, access_token });
 
 	return {
 		ventas,
-        metadatosDistinct,
+		metadatosDistinct,
 	};
 }
 

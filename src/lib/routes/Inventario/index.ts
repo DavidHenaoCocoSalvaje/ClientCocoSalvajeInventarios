@@ -86,48 +86,61 @@ export class InventarioFormat {
 }
 
 export class Movimiento {
-	static async getList(
-		url: string,
-		access_token: string,
-		skip: number = 0,
-		limit: number = 100,
-		sort: SortDirection = SortDirection.DESC
-	) {
+	static async getList({
+		url,
+		access_token,
+		skip = 0,
+		limit = 100,
+		sort = SortDirection.DESC
+	}: {
+		url: string;
+		access_token: string;
+		skip?: number;
+		limit?: number;
+		sort?: SortDirection;
+	}) {
 		const request = new CSRequest(url);
-		return await request.get<Array<IMovimiento>>(
-			'/inventario',
-			`/movimientos`,
-			access_token,
-			undefined,
-			{
+		return await request.get<Array<IMovimiento>>({
+			primaryRoute: '/inventario',
+			path: `/movimientos`,
+			accessToken: access_token,
+			query: {
 				skip: skip.toString(),
 				limit: limit.toString(),
 				sort: sort
 			}
-		);
+		});
 	}
 
-	static async getVentasAgrupadas(
-		url: string,
-		access_token: string,
-		start_date: string,
-		end_date: string,
-		sort: SortDirection = SortDirection.DESC,
-		frequency: IFrecuencia = IFrecuencia.DIARIO,
-		groupBy: Array<string> = ['variante_id'],
-		metaValorIds: Array<number> = []
-	) {
+	static async getVentasAgrupadas({
+		url,
+		access_token,
+		start_date,
+		end_date,
+		sort = SortDirection.DESC,
+		frequency = IFrecuencia.DIARIO,
+		groupBy = ['variante_id'],
+		metaValorIds = []
+	}: {
+		url: string;
+		access_token: string;
+		start_date: string;
+		end_date: string;
+		sort?: SortDirection;
+		frequency?: IFrecuencia;
+		groupBy?: Array<string>;
+		metaValorIds?: Array<number>;
+	}) {
 		const request = new CSRequest(url);
 		const body = {
 			group_by: groupBy,
 			meta_valor_ids: metaValorIds
 		};
-		return await request.post<Array<IVenta>>(
-			'/inventario',
-			`/movimientos-agrupados`,
-			access_token,
-			undefined,
-			{
+		return await request.post<Array<IVenta>>({
+			primaryRoute: '/inventario',
+			path: `/movimientos-agrupados`,
+			accessToken: access_token,
+			query: {
 				start_date: start_date,
 				end_date: end_date,
 				sort: sort,
@@ -136,19 +149,28 @@ export class Movimiento {
 				filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
 			},
 			body
-		);
+		});
 	}
 
-	static async getVentasAgrupadasLikeMetaValor(
-		url: string,
-		access_token: string,
-		start_date: string,
-		end_date: string,
-		like_meta_valor: string,
-		sort: SortDirection = SortDirection.DESC,
-		frequency: IFrecuencia = IFrecuencia.DIARIO,
-		groupBy: Array<string> = ['variante_id']
-	) {
+	static async getVentasAgrupadasLikeMetaValor({
+		url,
+		access_token,
+		start_date,
+		end_date,
+		like_meta_valor,
+		sort = SortDirection.DESC,
+		frequency = IFrecuencia.DIARIO,
+		groupBy = ['variante_id']
+	}: {
+		url: string;
+		access_token: string;
+		start_date: string;
+		end_date: string;
+		like_meta_valor: string;
+		sort?: SortDirection;
+		frequency?: IFrecuencia;
+		groupBy?: Array<string>;
+	}) {
 		const request = new CSRequest(url);
 		let body = {};
 		if (groupBy.includes('meta_valor')) {
@@ -157,12 +179,11 @@ export class Movimiento {
 				group_by: groupBy
 			};
 		}
-		return await request.post<Array<IVenta>>(
-			'/inventario',
-			`/movimientos-agrupados`,
-			access_token,
-			undefined,
-			{
+		return await request.post<Array<IVenta>>({
+			primaryRoute: '/inventario',
+			path: `/movimientos-agrupados`,
+			accessToken: access_token,
+			query: {
 				start_date: start_date,
 				end_date: end_date,
 				sort: sort,
@@ -172,12 +193,16 @@ export class Movimiento {
 				filtro_tipo_soporte: IFiltroTipoSoporte.PEDIDO
 			},
 			body
-		);
+		});
 	}
 
-	static async getMetadatos(url: string, access_token: string) {
+	static async getMetadatos({ url, access_token }: { url: string; access_token: string }) {
 		const request = new CSRequest(url);
-		return await request.get<Array<IMetadato>>('/inventario', '/metadatos-distinct', access_token);
+		return await request.get<Array<IMetadato>>({
+			primaryRoute: '/inventario',
+			path: '/metadatos-distinct',
+			accessToken: access_token
+		});
 	}
 }
 
@@ -188,8 +213,12 @@ export interface ISaldo {
 }
 
 export class Slado {
-	async get_list(url: string, access_token: string) {
+	async get_list({ url, access_token }: { url: string; access_token: string }) {
 		const request = new CSRequest(url);
-		return await request.get<Array<ISaldo>>('/inventario', `/saldos`, access_token);
+		return await request.get<Array<ISaldo>>({
+			primaryRoute: '/inventario',
+			path: `/saldos`,
+			accessToken: access_token
+		});
 	}
 }

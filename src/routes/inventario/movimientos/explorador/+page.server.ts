@@ -6,10 +6,15 @@ export async function load({ cookies }) {
     const access_token = cookies.get('token') || '';
     const request = new CSRequest(BACKEND_API_URL);
 
-    const movimientos = await request.get<Array<IMovimiento>>('/inventario', '/movimientos', access_token, undefined, {
-        skip: '0',
-        limit: '200',
-        sort: 'desc'
+    const movimientos = await request.get<Array<IMovimiento>>({
+        primaryRoute: '/inventario',
+        path: '/movimientos',
+        accessToken: access_token,
+        query: {
+            skip: '0',
+            limit: '200',
+            sort: 'desc'
+        }
     });
 
     return { movimientos };

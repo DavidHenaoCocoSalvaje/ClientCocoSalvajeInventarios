@@ -10,13 +10,13 @@
 	let sortColumns = ['fecha', 'numero_factura_proveedor', 'factura_numero', 'contabilizado', 'log'];
 
 	async function refresh() {
-		compras = await Compra.get_list(
-			data.backendUrlCsr,
-			data.access_token,
-			0,
-			rows,
-			SortDirection.DESC
-		);
+		compras = await Compra.get_list({
+			url: data.backendUrlCsr,
+			access_token: data.access_token,
+			skip: 0,
+			limit: rows,
+			sort: SortDirection.DESC
+		});
 	}
 </script>
 

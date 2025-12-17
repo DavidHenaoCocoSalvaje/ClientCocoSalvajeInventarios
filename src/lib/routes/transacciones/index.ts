@@ -53,47 +53,57 @@ export class TransaccionesFormat {
 }
 
 export class Pedido {
-	static async get_list(
-		url: string,
-		access_token: string,
-		skip: number = 0,
-		limit: number = 100,
-		sort: SortDirection = SortDirection.DESC
-	) {
+	static async get_list({
+		url,
+		access_token,
+		skip = 0,
+		limit = 100,
+		sort = SortDirection.DESC
+	}: {
+		url: string;
+		access_token: string;
+		skip?: number;
+		limit?: number;
+		sort?: SortDirection;
+	}) {
 		const request = new CSRequest(url);
-		return await request.get<Array<IPedido>>(
-			'/transacciones',
-			`/pedidos`,
-			access_token,
-			undefined,
-			{
+		return await request.get<Array<IPedido>>({
+			primaryRoute: '/transacciones',
+			path: `/pedidos`,
+			accessToken: access_token,
+			query: {
 				skip: skip.toString(),
 				limit: limit.toString(),
 				sort: sort
 			}
-		);
+		});
 	}
 }
 
 export class Compra {
-	static async get_list(
-		url: string,
-		access_token: string,
-		skip: number = 0,
-		limit: number = 100,
-		sort: SortDirection = SortDirection.DESC
-	) {
+	static async get_list({
+		url,
+		access_token,
+		skip = 0,
+		limit = 100,
+		sort = SortDirection.DESC
+	}: {
+		url: string;
+		access_token: string;
+		skip?: number;
+		limit?: number;
+		sort?: SortDirection;
+	}) {
 		const request = new CSRequest(url);
-		return await request.get<Array<ICompra>>(
-			'/transacciones',
-			`/compras`,
-			access_token,
-			undefined,
-			{
+		return await request.get<Array<ICompra>>({
+			primaryRoute: '/transacciones',
+			path: `/compras`,
+			accessToken: access_token,
+			query: {
 				skip: skip.toString(),
 				limit: limit.toString(),
 				sort: sort
 			}
-		);
+		});
 	}
 }

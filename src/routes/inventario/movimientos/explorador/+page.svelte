@@ -13,17 +13,16 @@
 
 	async function refresh() {
 		const request = new CSRequest(data.backendUrlCsr);
-		movimientos = await request.get<Array<IMovimiento>>(
-			'/inventario',
-			'/movimientos',
-			data.access_token,
-			undefined,
-			{
+		movimientos = await request.get<Array<IMovimiento>>({
+			primaryRoute: '/inventario',
+			path: '/movimientos',
+			accessToken: data.access_token,
+			query: {
 				skip: '0',
 				limit: `${rows}`,
 				sort: 'desc'
 			}
-		);
+		});
 	}
 </script>
 

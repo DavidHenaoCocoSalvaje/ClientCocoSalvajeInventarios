@@ -6,7 +6,7 @@ export async function load({ cookies }) {
     const access_token = cookies.get('token') || '';
     const saldo = new Slado();
     return {
-        saldos: await saldo.get_list(BACKEND_API_URL, access_token)
+        saldos: await saldo.get_list({ url: BACKEND_API_URL, access_token })
     };
 }
 

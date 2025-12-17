@@ -6,7 +6,12 @@
 	import LineChartComponent from '$lib/components/LineChartComponent.svelte';
 	import RefreshSVG from '$lib/components/RefreshSVG.svelte';
 	import Select from '$lib/components/Select.svelte';
-	import { InventarioFormat, IFrecuencia, Movimiento, type IVenta } from '$lib/routes/Inventario/index.js';
+	import {
+		InventarioFormat,
+		IFrecuencia,
+		Movimiento,
+		type IVenta
+	} from '$lib/routes/Inventario/index.js';
 
 	let { data } = $props();
 	let ventasPorReferencia: Array<IVenta> = $state(data.ventas);
@@ -38,14 +43,14 @@
 	let loadingRefreshVentasPorReferencia = $state(false);
 	async function refreshVentasPorReferencia() {
 		loadingRefreshVentasPorReferencia = true;
-		ventasPorReferencia = await Movimiento.getVentasAgrupadas(
-			data.backendUrlCsr,
-			data.access_token,
-			datesReference.startDate,
-			datesReference.endDate,
-			SortDirection.DESC,
-			frecuenciaPorReferenciaSelected
-		);
+		ventasPorReferencia = await Movimiento.getVentasAgrupadas({
+			url: data.backendUrlCsr,
+			access_token: data.access_token,
+			start_date: datesReference.startDate,
+			end_date: datesReference.endDate,
+			sort: SortDirection.DESC,
+			frequency: frecuenciaPorReferenciaSelected
+		});
 		loadingRefreshVentasPorReferencia = false;
 	}
 
@@ -60,15 +65,15 @@
 	let loadingRefreshHistoricoVentas = $state(false);
 	async function refreshHistoricoVentas() {
 		loadingRefreshHistoricoVentas = true;
-		historicoVentas = await Movimiento.getVentasAgrupadas(
-			data.backendUrlCsr,
-			data.access_token,
-			datesHistorico.startDate,
-			datesHistorico.endDate,
-			SortDirection.DESC,
-			frecuencyHistoricoSelected,
-			[]
-		);
+		historicoVentas = await Movimiento.getVentasAgrupadas({
+			url: data.backendUrlCsr,
+			access_token: data.access_token,
+			start_date: datesHistorico.startDate,
+			end_date: datesHistorico.endDate,
+			sort: SortDirection.DESC,
+			frequency: frecuencyHistoricoSelected,
+			metaValorIds: []
+		});
 		loadingRefreshHistoricoVentas = false;
 	}
 </script>

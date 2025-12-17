@@ -12,13 +12,13 @@
 	let sortColumns = ['fecha', 'numero', 'pago', 'factura_numero', 'contabilizado', 'log'];
 
 	async function refresh() {
-		pedidos = await Pedido.get_list(
-			data.backendUrlCsr,
-			data.access_token,
-			0,
-			rows,
-			SortDirection.DESC
-		);
+		pedidos = await Pedido.get_list({
+			url: data.backendUrlCsr,
+			access_token: data.access_token,
+			skip: 0,
+			limit: rows,
+			sort: SortDirection.DESC
+		});
 	}
 
 	let pedido_numero = $state('');
@@ -28,9 +28,12 @@
 			return;
 		}
 		const request = new CSRequest(data.backendUrlCsr);
-		const response = await request.post<boolean>('/transacciones', `/facturar`, data.access_token, [
-			pedido_numero
-		]);
+		const response = await request.post<boolean>({
+			primaryRoute: '/transacciones',
+			path: `/facturar`,
+			accessToken: data.access_token,
+			params: [pedido_numero]
+		});
 		if (response) {
 			alert(`Pedido ${pedido_numero} facturado correctamente.`);
 		} else {
@@ -40,7 +43,11 @@
 
 	async function facturar_pendientes() {
 		const request = new CSRequest(data.backendUrlCsr);
-		request.post('/transacciones', '/facturar-pendientes', data.access_token);
+		request.post({
+			primaryRoute: '/transacciones',
+			path: '/facturar-pendientes',
+			accessToken: data.access_token
+		});
 	}
 </script>
 

@@ -1,14 +1,49 @@
 type TBody = Record<string, object | string | number | boolean | undefined | null> | FormData;
 
+
+export interface RequestOptions {
+	method: string;
+	primaryRoute: string;
+	path: string;
+	accessToken: string;
+	params?: string[];
+	query?: Record<string, string>;
+	body?: TBody;
+}
+
+export interface MethodOptions {
+	primaryRoute: string;
+	path: string;
+	accessToken: string;
+	params?: string[];
+	query?: Record<string, string>;
+	body?: TBody;
+}
+
+// Helper specific to get/delete/options which typically don't have a body,
+// although the main request method supports it.
+export interface NoBodyMethodOptions {
+	primaryRoute: string;
+	path: string;
+	accessToken: string;
+	params?: string[];
+	query?: Record<string, string>;
+}
+
 export class CSRequest {
 	constructor(public backendUrl: string) { }
 
-	private buildUrl(
-		host: string,
-		path: string,
-		params?: string[],
-		query?: Record<string, string>
-	) {
+	private buildUrl({
+		host,
+		path,
+		params,
+		query
+	}: {
+		host: string;
+		path: string;
+		params?: string[];
+		query?: Record<string, string>;
+	}) {
 		const baseUrl = this.backendUrl.replace(/\/+$/, '');
 		const hostPath = host.replace(/^\/+/, '');
 		const pathPart = path.replace(/^\/+/, '');
@@ -28,16 +63,16 @@ export class CSRequest {
 		return url.toString();
 	}
 
-	async request<T>(
-		method: string,
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>,
-		body?: TBody
-	): Promise<T> {
-		const url = this.buildUrl(primaryRoute, path, params, query);
+	async request<T>({
+		method,
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query,
+		body
+	}: RequestOptions): Promise<T> {
+		const url = this.buildUrl({ host: primaryRoute, path, params, query });
 
 		const response = await fetch(url, {
 			method,
@@ -52,69 +87,115 @@ export class CSRequest {
 		return response.json();
 	}
 
-	async get<T>(
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>
-	): Promise<T> {
-		return this.request<T>('GET', primaryRoute, path, accessToken, params, query);
+	async get<T>({
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query
+	}: NoBodyMethodOptions): Promise<T> {
+		return this.request<T>({
+			method: 'GET',
+			primaryRoute,
+			path,
+			accessToken,
+			params,
+			query
+		});
 	}
 
-	async post<T>(
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>,
-		body: TBody = {}
-	): Promise<T> {
-		return this.request<T>('POST', primaryRoute, path, accessToken, params, query, body);
+	async post<T>({
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query,
+		body = {}
+	}: MethodOptions): Promise<T> {
+		return this.request<T>({
+			method: 'POST',
+			primaryRoute,
+			path,
+			accessToken,
+			params,
+			query,
+			body
+		});
 	}
 
-	async put<T>(
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>,
-		body: TBody = {}
-	): Promise<T> {
-		return this.request<T>('PUT', primaryRoute, path, accessToken, params, query, body);
+	async put<T>({
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query,
+		body = {}
+	}: MethodOptions): Promise<T> {
+		return this.request<T>({
+			method: 'PUT',
+			primaryRoute,
+			path,
+			accessToken,
+			params,
+			query,
+			body
+		});
 	}
 
-	async delete<T>(
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>
-	): Promise<T> {
-		return this.request<T>('DELETE', primaryRoute, path, accessToken, params, query);
+	async delete<T>({
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query
+	}: NoBodyMethodOptions): Promise<T> {
+		return this.request<T>({
+			method: 'DELETE',
+			primaryRoute,
+			path,
+			accessToken,
+			params,
+			query
+		});
 	}
 
-	async patch<T>(
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>,
-		body: TBody = {}
-	): Promise<T> {
-		return this.request<T>('PATCH', primaryRoute, path, accessToken, params, query, body);
+	async patch<T>({
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query,
+		body = {}
+	}: MethodOptions): Promise<T> {
+		return this.request<T>({
+			method: 'PATCH',
+			primaryRoute,
+			path,
+			accessToken,
+			params,
+			query,
+			body
+		});
 	}
 
-	async options<T>(
-		primaryRoute: string,
-		path: string,
-		accessToken: string,
-		params?: string[],
-		query?: Record<string, string>
-	): Promise<T> {
-		return this.request<T>('OPTIONS', primaryRoute, path, accessToken, params, query);
+	async options<T>({
+		primaryRoute,
+		path,
+		accessToken,
+		params,
+		query
+	}: NoBodyMethodOptions): Promise<T> {
+		return this.request<T>({
+			method: 'OPTIONS',
+			primaryRoute,
+			path,
+			accessToken,
+			params,
+			query
+		});
 	}
 }
+
 
 export enum SortDirection {
 	ASC = 'asc',
