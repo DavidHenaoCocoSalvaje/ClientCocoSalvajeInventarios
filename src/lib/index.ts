@@ -1,28 +1,31 @@
 type TBody = Record<string, object | string | number | boolean | undefined | null> | FormData;
 
 export class CSRequest {
-	constructor(public backendUrl: string) {}
+	constructor(public backendUrl: string) { }
 
 	private buildUrl(
 		host: string,
 		path: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {}
+		params?: string[],
+		query?: Record<string, string>
 	) {
-		// Asegurar que las barras estén correctamente colocadas
-		const baseUrl = this.backendUrl.endsWith('/') ? this.backendUrl.slice(0, -1) : this.backendUrl;
-		const hostPath = host.startsWith('/') ? host : '/' + host;
-		const pathPart = path.startsWith('/') ? path : '/' + path;
+		const baseUrl = this.backendUrl.replace(/\/+$/, '');
+		const hostPath = host.replace(/^\/+/, '');
+		const pathPart = path.replace(/^\/+/, '');
 
-		let url = baseUrl + hostPath + pathPart;
+		const url = new URL(`${baseUrl}/${hostPath}/${pathPart}`);
 
 		if (params && params.length > 0) {
-			url += '/' + params.join('/');
+			url.pathname += '/' + params.join('/');
 		}
-		if (query && Object.keys(query).length > 0) {
-			url += '?' + new URLSearchParams(query).toString();
+
+		if (query) {
+			Object.entries(query).forEach(([key, value]) => {
+				url.searchParams.append(key, value);
+			});
 		}
-		return url;
+
+		return url.toString();
 	}
 
 	async request<T>(
@@ -30,27 +33,30 @@ export class CSRequest {
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {},
-		body: TBody | undefined = undefined
+		params?: string[],
+		query?: Record<string, string>,
+		body?: TBody
 	): Promise<T> {
 		const url = this.buildUrl(primaryRoute, path, params, query);
-		return await fetch(url, {
-			method: method,
+
+		const response = await fetch(url, {
+			method,
 			cache: 'no-cache',
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: `Bearer ${accessToken}`
 			},
-			body: body ? JSON.stringify(body) : body
-		}).then((response) => response.json());
+			body: body ? JSON.stringify(body) : undefined
+		});
+
+		return response.json();
 	}
 
 	async get<T>(
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params?: Array<string>,
+		params?: string[],
 		query?: Record<string, string>
 	): Promise<T> {
 		return this.request<T>('GET', primaryRoute, path, accessToken, params, query);
@@ -60,8 +66,8 @@ export class CSRequest {
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {},
+		params?: string[],
+		query?: Record<string, string>,
 		body: TBody = {}
 	): Promise<T> {
 		return this.request<T>('POST', primaryRoute, path, accessToken, params, query, body);
@@ -71,8 +77,8 @@ export class CSRequest {
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {},
+		params?: string[],
+		query?: Record<string, string>,
 		body: TBody = {}
 	): Promise<T> {
 		return this.request<T>('PUT', primaryRoute, path, accessToken, params, query, body);
@@ -82,8 +88,8 @@ export class CSRequest {
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {}
+		params?: string[],
+		query?: Record<string, string>
 	): Promise<T> {
 		return this.request<T>('DELETE', primaryRoute, path, accessToken, params, query);
 	}
@@ -92,8 +98,8 @@ export class CSRequest {
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {},
+		params?: string[],
+		query?: Record<string, string>,
 		body: TBody = {}
 	): Promise<T> {
 		return this.request<T>('PATCH', primaryRoute, path, accessToken, params, query, body);
@@ -103,8 +109,8 @@ export class CSRequest {
 		primaryRoute: string,
 		path: string,
 		accessToken: string,
-		params: Array<string> = [],
-		query: Record<string, string> = {}
+		params?: string[],
+		query?: Record<string, string>
 	): Promise<T> {
 		return this.request<T>('OPTIONS', primaryRoute, path, accessToken, params, query);
 	}
@@ -142,15 +148,10 @@ export function sortByProperties<T>(records: T[], sortCriteria: SortCriteria): T
 			const valueA = a[key];
 			const valueB = b[key];
 
-			// Use a comparison factor to easily flip the result for descending order
 			const sortOrder = direction === 'asc' ? 1 : -1;
 
-			if (valueA < valueB) {
-				return -1 * sortOrder;
-			}
-			if (valueA > valueB) {
-				return 1 * sortOrder;
-			}
+			if (valueA < valueB) return -1 * sortOrder;
+			if (valueA > valueB) return 1 * sortOrder;
 		}
 		return 0;
 	});
@@ -167,26 +168,15 @@ export function addFilter(filterCriteria: FilterCriteria, key: string, value: st
 }
 
 export function filterByCriteria<T>(records: T[], filterCriteria: FilterCriteria): T[] {
-	const searchCriterion = Object.entries(filterCriteria).map(([key, value]) => ({
-		key: key as keyof T,
-		value: value
-	}));
+	const activeCriteria = Object.entries(filterCriteria).filter(([, value]) => value);
 
-	const activeCriteria = searchCriterion.filter((c) => c.value);
-
-	if (activeCriteria.length === 0) {
-		return records; // Return all records if no active criteria
-	}
+	if (activeCriteria.length === 0) return records;
 
 	return records.filter((record) => {
-		return activeCriteria.every((criterion) => {
-			const { key, value: searchTerm } = criterion;
-			const recordValue = record[key];
-
+		return activeCriteria.every(([key, searchTerm]) => {
+			const recordValue = record[key as keyof T];
 			const recordValueString = String(recordValue ?? '').toLowerCase();
-			const searchTermString = searchTerm.toLowerCase();
-
-			return recordValueString.includes(searchTermString);
+			return recordValueString.includes(searchTerm.toLowerCase());
 		});
 	});
 }
@@ -208,50 +198,39 @@ export function formatCop(v: number) {
 	}).format(v);
 }
 
-export function formatDate(date: Date, hora: boolean = false) {
-	if (typeof date === 'string') {
-		date = new Date(date);
-	}
+export function formatDate(date: Date | string, hora: boolean = false) {
+	const d = typeof date === 'string' ? new Date(date) : date;
 
-	let options = {};
-	if (hora) {
-		options = {
+	const options: Intl.DateTimeFormatOptions = hora
+		? {
 			year: 'numeric',
 			month: '2-digit',
 			day: '2-digit',
 			hour: '2-digit',
 			minute: '2-digit',
 			second: '2-digit'
-		};
-	} else {
-		options = {
+		}
+		: {
 			year: 'numeric',
 			month: '2-digit',
 			day: '2-digit'
 		};
-	}
 
-	return date.toLocaleDateString('es-CO', options);
+	return d.toLocaleDateString('es-CO', options);
 }
 
 export function startEndMonthString(date: Date | string): [string, string] {
-	if (typeof date === 'string') {
-		date = new Date(date);
-	}
-
-	const start = new Date(date.getFullYear(), date.getMonth(), 1);
-	const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+	const d = typeof date === 'string' ? new Date(date) : date;
+	const start = new Date(d.getFullYear(), d.getMonth(), 1);
+	const end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
 
 	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
 }
 
 export function yearStartAndMonthEndString(date: Date | string): [string, string] {
-	if (typeof date === 'string') {
-		date = new Date(date);
-	}
-
-	const start = new Date(date.getFullYear(), 0, 1, 0, 0, 0);
-	const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+	const d = typeof date === 'string' ? new Date(date) : date;
+	const start = new Date(d.getFullYear(), 0, 1, 0, 0, 0);
+	const end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
 
 	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
 }
@@ -261,7 +240,6 @@ export function alfanumericRandom(length = 16) {
 	let result = '';
 
 	for (let i = 0; i < length; i++) {
-		// Combina múltiples fuentes de aleatoriedad
 		const random = Math.random() * Date.now() * (i + 1);
 		const index = Math.floor((random % 1) * chars.length);
 		result += chars[index];
