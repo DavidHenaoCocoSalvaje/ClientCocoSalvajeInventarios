@@ -1,12 +1,13 @@
 <script lang="ts">
 	interface Props {
-		action: () => void;
+		action?: () => void;
 		style?: string;
 		children?: any;
+		type?: 'button' | 'submit' | 'reset';
 	}
 
-	let { action, style, children }: Props = $props();
+	let { action, style, children, type = 'button' }: Props = $props();
 </script>
 
-<button class="w-fit cursor-pointer rounded-md px-4 py-1 {style}" onclick={action}
+<button {type} class="w-fit cursor-pointer rounded-md px-4 py-1 {style}" onclick={action}
 	>{@render children()}</button>
