@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { SortDirection } from '$lib';
 	import DataGrid from '$lib/components/DataGrid.svelte';
+	import Section from '$lib/components/Section.svelte';
+	import Title from '$lib/components/Title.svelte';
 	import { Compra, FacturacionFormat } from '$lib/routes/facturacion/index.js';
 
 	let { data } = $props();
@@ -20,10 +22,10 @@
 	}
 </script>
 
-<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
-	<h1 class="w-full text-center text-lg font-bold">Explorador de compras</h1>
+<Section>
+	<Title>Explorador de compras</Title>
 	<h2 class="w-full text-lg font-semibold">Compras facturadas</h2>
-</section>
+</Section>
 
 {#if f_compras}
 	<DataGrid data={f_compras} columns={sortColumns} bind:rows refresh_data={refresh} />

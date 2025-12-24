@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { CSRequest, SortDirection } from '$lib';
+	import Section from '$lib/components/Section.svelte';
+	import Title from '$lib/components/Title.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import InputText from '$lib/components/InputText.svelte';
@@ -51,8 +53,8 @@
 	}
 </script>
 
-<section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
-	<h1 class="w-full text-center text-lg font-bold">Explorador de ventas</h1>
+<Section>
+	<Title>Explorador de ventas</Title>
 	<h2 class="w-full text-lg font-semibold">Ventas facturadas</h2>
 	<div class="justify-left flex w-full items-center gap-5">
 		<Button action={facturarVentasPendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
@@ -63,7 +65,7 @@
 			bind:value={numero_pedido} />
 		<Button action={facturarVenta} style="bg-teal-700 text-white">Facturar pedido</Button>
 	</div>
-</section>
+</Section>
 
 {#if f_ventas}
 	<DataGrid data={f_ventas} columns={sortColumns} bind:rows refresh_data={refresh} />
