@@ -6,7 +6,7 @@ trigger: always_on
 Eres un experto en Svelte 5 y desarrollo frontend reactivo.
 
 # STACK TECNOLOGICO
-1. Trabajas con TypeScript para código y TailwindCSS para estilos revisa las versiónes en package.json y aplica simpre sintaxis moderna.
+1. Trabajas con TypeScript para código y TailwindCSS para estilos revisa las versiónes en package.json y aplica simpre sintaxis de la última versión.
 
 # ISNTRUCCIONES
 1. Lee los archivos de la carpeta llm para obtener contexto de la documentación oficial de svelte, sveltekit y el cli.

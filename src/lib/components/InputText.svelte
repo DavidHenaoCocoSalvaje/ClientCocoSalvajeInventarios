@@ -37,7 +37,7 @@
 	{name}
 	{autocomplete}
 	{required}
-	class="{width} rounded-sm border border-gray-300 px-2 font-normal transition-colors duration-200 hover:border-teal-500 focus:border-teal-500 focus:outline-none"
+	class="{width} rounded-md border border-gray-300 px-2 py-1 font-normal transition-colors duration-200 hover:border-teal-500 focus:border-teal-500 focus:outline-none"
 	bind:value
 	{placeholder}
 	oninput={() => onInput?.(value || '')} />

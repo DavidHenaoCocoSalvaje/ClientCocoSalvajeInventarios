@@ -1,7 +1,7 @@
 services:
   integraciones-client:
-    image: integraciones-client:development
-    container_name: integraciones-client-development
+    image: integraciones-client
+    container_name: integraciones-client
     user: "1001:1001"
     ports:
       - "3003:3000"

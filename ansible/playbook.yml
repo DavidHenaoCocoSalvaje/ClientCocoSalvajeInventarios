@@ -2,16 +2,11 @@
 - name: Deploy server
   hosts: hostinger
   vars:
-      # La variable git_branch se pasa como un extra-var desde el script de shell
-      # y se usa para construir los nombres de archivos y tags.
-      # Si no se provee, el valor por defecto será 'main'.
-      git_branch: "{{ git_branch | default('main') }}"
-      image_tag: "{% if git_branch == 'main' %}latest{% else %}{{ git_branch }}{% endif %}"
-      local_image_path: "{{ playbook_dir }}/../docker/integraciones-client-{{ image_tag }}.tar"
-      local_env_path: "{{ playbook_dir }}/../{% if git_branch == 'main' %}.env.production{% else %}.env.{{ git_branch }}{% endif %}"
-      local_compose_path: "{{ playbook_dir }}/../docker-compose{% if git_branch != 'main' %}.{{ git_branch }}{% endif %}.yml"
-      image_name: "integraciones-client:{{ image_tag }}"
-      remote_folder: "/home/coco/images/frontend/integraciones/{{ git_branch }}"
+      local_image_path: "{{ playbook_dir }}/../docker/integraciones-client.tar"
+      local_env_path: "{{ playbook_dir }}/../.env.production"
+      local_compose_path: "{{ playbook_dir }}/../docker-compose.yml"
+      image_name: "integraciones-client"
+      remote_folder: "/home/coco/images/frontend/integraciones"
 
   tasks:
       - name: Send docker-image
