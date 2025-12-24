@@ -3,7 +3,7 @@ import { CSRequest, formatDate, SortDirection } from '$lib';
 interface IVenta {
 	id: string;
 	fecha: Date;
-	numero: number;
+	numero_pedido: number;
 	pago: boolean;
 	factura_numero?: number;
 	contabilizado: boolean;

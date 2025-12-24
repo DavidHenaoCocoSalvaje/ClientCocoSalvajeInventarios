@@ -9,7 +9,7 @@
 	let ventas = $derived(data.ventas);
 	let f_ventas = $derived(FacturacionFormat.ventas(ventas));
 	let rows = $state(200);
-	let sortColumns = ['fecha', 'numero', 'pago', 'factura_numero', 'contabilizado', 'log'];
+	let sortColumns = ['fecha', 'numero_pedido', 'pago', 'factura_numero', 'contabilizado', 'log'];
 
 	async function refresh() {
 		ventas = await Venta.get_list({
@@ -21,9 +21,9 @@
 		});
 	}
 
-	let pedido_numero = $state('');
-	async function facturar_pedido() {
-		if (!pedido_numero) {
+	let numero_pedido = $state('');
+	async function facturarVenta() {
+		if (!numero_pedido) {
 			alert('Por favor, ingrese un número de pedido.');
 			return;
 		}
@@ -32,36 +32,36 @@
 			primaryRoute: '/facturacion',
 			path: `/facturar`,
 			accessToken: data.access_token,
-			params: [pedido_numero]
+			params: [numero_pedido]
 		});
 		if (response) {
-			alert(`Pedido ${pedido_numero} facturado correctamente.`);
+			alert(`Pedido ${numero_pedido} facturado correctamente.`);
 		} else {
-			alert(`Error al facturar el pedido ${pedido_numero}.`);
+			alert(`Error al facturar el pedido ${numero_pedido}.`);
 		}
 	}
 
-	async function facturar_pendientes() {
+	async function facturarVentasPendientes() {
 		const request = new CSRequest(data.backendUrlCsr);
 		request.post({
 			primaryRoute: '/facturacion',
-			path: '/facturar-pendientes',
+			path: '/facturar-ventas-pendientes',
 			accessToken: data.access_token
 		});
 	}
 </script>
 
 <section class="sticky top-0 z-20 flex w-full flex-col items-center gap-5 bg-white pt-5">
-	<h1 class="w-full text-center text-lg font-bold">Explorador de pedidos</h1>
-	<h2 class="w-full text-lg font-semibold">Pedidos facturados</h2>
+	<h1 class="w-full text-center text-lg font-bold">Explorador de ventas</h1>
+	<h2 class="w-full text-lg font-semibold">Ventas facturadas</h2>
 	<div class="justify-left flex w-full items-center gap-5">
-		<Button action={facturar_pendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
+		<Button action={facturarVentasPendientes} style="bg-teal-700 text-white">Facturar pendientes</Button>
 		<InputText
 			width="w-fit"
 			id="facturar_pedido"
 			placeholder="Número de pedido"
-			bind:value={pedido_numero} />
-		<Button action={facturar_pedido} style="bg-teal-700 text-white">Facturar pedido</Button>
+			bind:value={numero_pedido} />
+		<Button action={facturarVenta} style="bg-teal-700 text-white">Facturar pedido</Button>
 	</div>
 </section>
 
