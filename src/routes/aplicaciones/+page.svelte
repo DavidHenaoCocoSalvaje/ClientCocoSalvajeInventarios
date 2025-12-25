@@ -26,8 +26,10 @@
 
 <Section>
 	<Title>Aplicaciones y Servicios</Title>
-	<p class="mt-2 mb-8 text-gray-500">Conecta y gestiona los permisos de tus aplicaciones externas.</p>
-
+	<div class="w-full">
+		<p>Conecta aplicaciones externas.</p>
+	</div>
+	
 	<div class="flex flex-wrap gap-4 w-full">
 		<!-- Gmail Card -->
 		<div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all p-5 flex flex-col relative group w-64">
@@ -59,7 +61,7 @@
 			</div>
 			
 			<p class="text-xs text-gray-600 mb-4 grow">
-				Acceso a bandeja de entrada para procesar facturas.
+				Acceso a la bandeja de entrada.
 			</p>
 			
 			<button 

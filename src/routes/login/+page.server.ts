@@ -42,7 +42,7 @@ export const actions = {
                 path: '/',
                 httpOnly: true,
                 secure: false, // Cuando sea true, el cookie solo se puede acceder a través de HTTPS
-                sameSite: 'strict'
+                sameSite: 'lax'
             });
             redirect(303, redirectTo);
         } else if (res.status === 401) {
