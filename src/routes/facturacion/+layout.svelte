@@ -1,31 +1,9 @@
 <script lang="ts">
-	import type { Section } from '$lib/models/aside';
-	import AsideLeft from '../../lib/components/AsideLeft.svelte';
+	import AsideLeft from '$lib/components/AsideLeft.svelte';
+	import { sections as initialSections } from '$lib/routes/facturacion/navigation';
 
 	let { children } = $props();
-
-	let sections: Array<Section> = $state([
-		{
-			title: 'Ventas',
-			open: true,
-			items: [
-				{
-					title: 'Explorador',
-					selected: true
-				}
-			]
-		},
-		{
-			title: 'Compras',
-			open: false,
-			items: [
-				{
-					title: 'Explorador',
-					selected: false
-				}
-			]
-		}
-	]);
+	let sections = $state(initialSections);
 </script>
 
 <AsideLeft root="/facturacion" {sections} />

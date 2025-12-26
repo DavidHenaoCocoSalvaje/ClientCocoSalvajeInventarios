@@ -1,16 +1,13 @@
 <script lang="ts">
 	import type { Section } from '$lib/models/aside';
 	import { slide } from 'svelte/transition';
+	import { titleToPath } from '$lib/utils/string';
 	let { sections, root }: { sections: Array<Section>; root: string } = $props();
-
-	function titleToPath(title: string) {
-		return title.replace(/\s+/g, '-').toLowerCase();
-	}
 </script>
 
 <!-- shring-0 evita que el elemento se compima-->
 <aside
-	class="sticky top-0 left-0 h-screen w-50 shrink-0 border-r-1 border-r-gray-400 px-10 pt-19 pb-5 font-semibold">
+	class="sticky top-0 left-0 h-screen w-50 shrink-0 border-r border-r-gray-400 px-10 pt-19 pb-5 font-semibold">
 	<div class="flex flex-col gap-2">
 		{#each sections as section}
 			<button
