@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	let { children } = $props();
 	let showMenu = $state(false);
 	import '../app.css';
@@ -12,6 +12,7 @@
 		class="font-[Roboto Variable] fixed top-0 z-30 flex h-14 w-full items-center gap-5 bg-teal-700 px-10 font-sans text-sm font-semibold text-white">
 		<a class:text-teal-300={page.url.pathname === '/'} href="/">Inicio</a>
 		<a class:text-teal-300={page.url.pathname.startsWith('/facturacion')} href="/facturacion">Facturacion</a>
+		<!-- Dropdown Menu -->
 		<div class="ml-auto relative group">
 			<!-- Backdrop to close menu when clicking outside -->
 			{#if showMenu}
@@ -42,36 +43,45 @@
 						d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
 				</svg>
 			</button>
-			<!-- Dropdown Menu -->
-			<!-- Dropdown Menu -->
 			<div
-				class="{showMenu
+			class="{showMenu
 					? 'block'
 					: 'hidden group-hover:block'} absolute right-0 top-full z-30 pt-2 w-48 origin-top-right focus:outline-none">
 				<div
-					class="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 text-gray-800 font-normal">
-					<div class="py-1">
-						<a
-							href="/aplicaciones"
-							class="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700"
-							onclick={() => (showMenu = false)}>Aplicaciones</a
+				class="rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 text-gray-800 font-normal">
+				<div class="py-1">
+					<a
+					href="/perfil"
+					class="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700"
+					onclick={() => (showMenu = false)}>Perfil</a
+					>
+					<a
+					href="/usuarios"
+					class="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700"
+					onclick={() => (showMenu = false)}>Usuarios</a
+					>
+					<a
+					href="/permisos"
+					class="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700"
+					onclick={() => (showMenu = false)}>Permisos</a
+					>
+					<a
+					href="/aplicaciones"
+					class="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700"
+					onclick={() => (showMenu = false)}>Aplicaciones</a
+					>
+					<form method="POST" action="/logout" class="block w-full">
+						<button
+						type="submit"
+						class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700 cursor-pointer"
+						>Cerrar sesión</button
 						>
-						<a
-							href="/permisos"
-							class="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700"
-							onclick={() => (showMenu = false)}>Permisos</a
-						>
-						<form method="POST" action="/logout" class="block w-full">
-							<button
-								type="submit"
-								class="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 hover:text-teal-700 cursor-pointer"
-								>Cerrar sesión</button
-							>
-						</form>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>
+	</div>
+	<!-- Dropdown Menu -->
 	</header>
 {/if}
 
