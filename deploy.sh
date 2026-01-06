@@ -16,7 +16,7 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}🚀 Iniciando despliegue para${NC}"
 
 # Verificar que existe la imagen construida
-IMAGE_FILE="docker/integraciones-client.tar"
+IMAGE_FILE="build/integraciones-client.tar"
 if [ ! -f "$IMAGE_FILE" ]; then
     echo -e "${RED}❌ Error: No se encontró la imagen $IMAGE_FILE${NC}"
     echo -e "${YELLOW}💡 Ejecuta primero: ./build.sh${NC}"
