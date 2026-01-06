@@ -10,7 +10,7 @@
 	<div class="absolute -right-20 -bottom-20 z-0 opacity-[0.03] grayscale transition-all duration-700 hover:scale-110">
 		<Logo class="h-[600px] w-auto rotate-12" />
 	</div>
-	<div class="absolute -top-40 -left-40 z-0 opacity-[0.02] grayscale">
+	<div class="absolute -top-40 -left-40 z-0 opacity-[0.02] grayscale transition-all duration-700 hover:scale-110">
 		<Logo class="h-[800px] w-auto -rotate-12" />
 	</div>
 
