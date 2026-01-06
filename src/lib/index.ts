@@ -209,7 +209,8 @@ export interface SortCriterion<T> {
 
 export type SortCriteria = Record<string, SortDirection>;
 
-export function addSort(sortCriteria: SortCriteria, key: string, direction: SortDirection) {
+type AddSortParams = { sortCriteria: SortCriteria; key: string; direction: SortDirection }
+export function addSort({ sortCriteria, key, direction }: AddSortParams) {
 	if (sortCriteria[key] === direction.toLowerCase()) {
 		delete sortCriteria[key];
 	} else {
@@ -217,7 +218,8 @@ export function addSort(sortCriteria: SortCriteria, key: string, direction: Sort
 	}
 }
 
-export function sortByProperties<T>(records: T[], sortCriteria: SortCriteria): T[] {
+type SortByPropertiesParams<T> = { records: T[]; sortCriteria: SortCriteria }
+export function sortByProperties<T>({ records, sortCriteria }: SortByPropertiesParams<T>): T[] {
 	const sortCriterion = Object.entries(sortCriteria).map(([key, value]) => ({
 		key: key as keyof T,
 		direction: value
@@ -240,7 +242,8 @@ export function sortByProperties<T>(records: T[], sortCriteria: SortCriteria): T
 
 export type FilterCriteria = Record<string, string>;
 
-export function addFilter(filterCriteria: FilterCriteria, key: string, value: string) {
+type AddFilterParams = { filterCriteria: FilterCriteria; key: string; value: string }
+export function addFilter({ filterCriteria, key, value }: AddFilterParams) {
 	if (value === '') {
 		delete filterCriteria[key];
 	} else {
@@ -248,7 +251,8 @@ export function addFilter(filterCriteria: FilterCriteria, key: string, value: st
 	}
 }
 
-export function filterByCriteria<T>(records: T[], filterCriteria: FilterCriteria): T[] {
+type FilterByCriteriaParams<T> = { records: T[]; filterCriteria: FilterCriteria }
+export function filterByCriteria<T>({ records, filterCriteria }: FilterByCriteriaParams<T>): T[] {
 	const activeCriteria = Object.entries(filterCriteria).filter(([, value]) => value);
 
 	if (activeCriteria.length === 0) return records;
@@ -262,24 +266,27 @@ export function filterByCriteria<T>(records: T[], filterCriteria: FilterCriteria
 	});
 }
 
+type CapitalizeParams = { str: string; sep?: string; join?: string }
 export class StringUtils {
-	static capitilize(str: string, sep: string = ' ', join: string = ' ') {
+	static capitilize({ str, sep = ' ', join: joinStr = ' ' }: CapitalizeParams) {
 		return str
 			.split(sep)
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-			.join(join);
+			.join(joinStr);
 	}
 }
 
-export function formatCop(v: number) {
+type FormatCopParams = { value: number }
+export function formatCop({ value }: FormatCopParams) {
 	return Intl.NumberFormat('es-CO', {
 		style: 'currency',
 		currency: 'COP',
 		minimumFractionDigits: 2
-	}).format(v);
+	}).format(value);
 }
 
-export function formatDate(date: Date | string, hora: boolean = false) {
+type FormatDateParams = { date: Date | string; hora?: boolean }
+export function formatDate({ date, hora = false }: FormatDateParams) {
 	const d = typeof date === 'string' ? new Date(date) : date;
 
 	const options: Intl.DateTimeFormatOptions = hora
@@ -300,7 +307,8 @@ export function formatDate(date: Date | string, hora: boolean = false) {
 	return d.toLocaleDateString('es-CO', options);
 }
 
-export function startEndMonthString(date: Date | string): [string, string] {
+type StartEndMonthStringParams = { date: Date | string }
+export function startEndMonthString({ date }: StartEndMonthStringParams): [string, string] {
 	const d = typeof date === 'string' ? new Date(date) : date;
 	const start = new Date(d.getFullYear(), d.getMonth(), 1);
 	const end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
@@ -308,7 +316,8 @@ export function startEndMonthString(date: Date | string): [string, string] {
 	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
 }
 
-export function yearStartAndMonthEndString(date: Date | string): [string, string] {
+type YearStartAndMonthEndStringParams = { date: Date | string }
+export function yearStartAndMonthEndString({ date }: YearStartAndMonthEndStringParams): [string, string] {
 	const d = typeof date === 'string' ? new Date(date) : date;
 	const start = new Date(d.getFullYear(), 0, 1, 0, 0, 0);
 	const end = new Date(d.getFullYear(), d.getMonth() + 1, 0);
@@ -316,7 +325,8 @@ export function yearStartAndMonthEndString(date: Date | string): [string, string
 	return [start.toISOString().split('T')[0], end.toISOString().split('T')[0]];
 }
 
-export function alfanumericRandom(length = 16) {
+type AlfanumericRandomParams = { length?: number }
+export function alfanumericRandom({ length = 16 }: AlfanumericRandomParams = {}) {
 	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 	let result = '';
 

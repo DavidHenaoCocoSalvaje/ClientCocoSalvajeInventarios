@@ -50,13 +50,13 @@
 	let filterCriteria: FilterCriteria = $state({});
 
 	let filteredData: Array<Record<string, any>> = $derived.by(() => {
-		return filterByCriteria<Record<string, any>>(data, filterCriteria);
+		return filterByCriteria<Record<string, any>>({ records: data, filterCriteria });
 	});
 
 	let sortCriteria: SortCriteria = $state({});
 
 	let sortedData: Array<Record<string, any>> = $derived.by(() => {
-		return sortByProperties<Record<string, any>>(filteredData, sortCriteria);
+		return sortByProperties<Record<string, any>>({ records: filteredData, sortCriteria });
 	});
 
 	let cursor: Cursor = $state({
@@ -102,11 +102,11 @@
 					{#each dataColumns as column}
 						<th class="px-2 pb-2 font-semibold">
 							<div class="flex w-full justify-between gap-5 px-2">
-								<span>{StringUtils.capitilize(column, '_')}</span>
+							<span>{StringUtils.capitilize({ str: column, sep: '_' })}</span>
 								<div class="flex gap-2">
 									<button
 										aria-label="ascending"
-										onclick={() => addSort(sortCriteria, column, SortDirection.ASC)}>
+										onclick={() => addSort({ sortCriteria, key: column, direction: SortDirection.ASC })}>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											class="h-5 w-5 cursor-pointer {sortCriteria[column] === 'asc'
@@ -119,7 +119,7 @@
 									</button>
 									<button
 										aria-label="descending"
-										onclick={() => addSort(sortCriteria, column, SortDirection.DESC)}>
+										onclick={() => addSort({ sortCriteria, key: column, direction: SortDirection.DESC })}>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											class="h-5 w-5 rotate-180 transform cursor-pointer {sortCriteria[column] ===
@@ -142,7 +142,7 @@
 							<InputText
 								placeholder="filtro"
 								onInput={(v: string) => {
-									addFilter(filterCriteria, column, v);
+									addFilter({ filterCriteria, key: column, value: v });
 								}}></InputText>
 						</th>
 					{/each}

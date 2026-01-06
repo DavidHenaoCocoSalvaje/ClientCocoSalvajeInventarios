@@ -28,7 +28,7 @@
 						<li>
 							<a
 								class="transition-colors duration-200 hover:text-teal-600"
-								href="{root}/{titleToPath(section.title)}/{titleToPath(item.title)}"
+								href="{root}/{titleToPath({ title: section.title })}/{titleToPath({ title: item.title })}"
 								>{item.title}</a>
 						</li>
 					{/each}

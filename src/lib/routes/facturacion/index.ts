@@ -38,7 +38,7 @@ export class FacturacionFormat {
 	static ventas(ventas: Array<IVenta>): Array<IVentaFormat> {
 		return ventas.map((venta: IVenta) => ({
 			...venta,
-			fecha: formatDate(venta.fecha, true),
+			fecha: formatDate({ date: venta.fecha, hora: true }),
 			factura_numero: venta.factura_numero ? venta.factura_numero.toString() : '',
 			log: venta.log ? venta.log : '-'
 		}));
@@ -47,7 +47,7 @@ export class FacturacionFormat {
 	static compras(compras: Array<ICompra>): Array<ICompraFormat> {
 		let result: Array<any> = compras.map((compra: ICompra) => ({
 			...compra,
-			fecha: formatDate(compra.fecha, true),
+			fecha: formatDate({ date: compra.fecha, hora: true }),
 			factura_numero: compra.factura_numero ? compra.factura_numero.toString() : '',
 			log: compra.log ? compra.log : '-'
 		}));

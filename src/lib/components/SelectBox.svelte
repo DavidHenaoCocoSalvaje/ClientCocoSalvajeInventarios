@@ -16,11 +16,15 @@
 
 	let { options, todos, onToogle }: Props = $props();
 	let filtredCriteria: FilterCriteria = $state({});
-	let checkAll = $state(todos);
+	let checkAll = $state(false);
+
+	$effect(() => {
+		checkAll = todos;
+	});
 	const input_id = alfanumericRandom();
 
 	let filtredOptions = $derived.by(() => {
-		return filterByCriteria(options, filtredCriteria);
+		return filterByCriteria({ records: options, filterCriteria: filtredCriteria });
 	});
 
 	function toggle(option: Option) {
@@ -56,7 +60,7 @@
 		<InputText
 			width=""
 			placeholder="filtro"
-			onInput={(v: string) => addFilter(filtredCriteria, 'label', v)}></InputText>
+			onInput={(v: string) => addFilter({ filterCriteria: filtredCriteria, key: 'label', value: v })}></InputText>
 		<button
 			class="intems-center flex w-fit cursor-pointer items-center gap-2"
 			type="button"

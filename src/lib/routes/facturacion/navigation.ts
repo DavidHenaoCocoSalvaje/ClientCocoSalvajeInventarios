@@ -24,13 +24,15 @@ export const sections: Array<Section> = [
     }
 ];
 
-export function getDefaultPath(root: string) {
+type GetDefaultPathParams = { root: string }
+export function getDefaultPath({ root }: GetDefaultPathParams) {
     for (const section of sections) {
         const selectedItem = section.items.find((item) => item.selected);
         if (selectedItem) {
-            return `${root}/${titleToPath(section.title)}/${titleToPath(selectedItem.title)}`;
+            return `${root}/${titleToPath({ title: section.title })}/${titleToPath({ title: selectedItem.title })}`;
         }
     }
     // Fallback si nada está seleccionado
-    return `${root}/${titleToPath(sections[0].title)}/${titleToPath(sections[0].items[0].title)}`;
+    return `${root}/${titleToPath({ title: sections[0].title })}/${titleToPath({ title: sections[0].items[0].title })}`;
 }
+
