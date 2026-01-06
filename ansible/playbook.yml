@@ -2,7 +2,7 @@
 - name: Deploy server
   hosts: hostinger
   vars:
-      local_image_path: "{{ playbook_dir }}/../docker/integraciones-client.tar"
+      local_image_path: "{{ playbook_dir }}/../build/integraciones-client.tar"
       local_env_path: "{{ playbook_dir }}/../.env.production"
       local_compose_path: "{{ playbook_dir }}/../docker-compose.yml"
       image_name: "integraciones-client"

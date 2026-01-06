@@ -14,11 +14,12 @@ interface IVenta {
 interface ICompra {
 	id: string;
 	fecha: Date;
+	nombre_proveedor: string;
 	factura_id?: number;
 	factura_numero?: number;
 	contabilizado: boolean;
 	q_intentos: number;
-	numero_factura_proveedor?: string;
+	factura_proveedor: string;
 	log?: string;
 }
 
@@ -27,9 +28,10 @@ interface IVentaFormat extends Omit<IVenta, 'fecha' | 'factura_numero'> {
 	factura_numero: string;
 }
 
-interface ICompraFormat extends Omit<ICompra, 'fecha' | 'factura_numero'> {
+interface ICompraFormat extends Omit<ICompra, 'fecha' | 'factura_numero' | 'nombre_proveedor'> {
 	fecha: string;
 	factura_numero: string;
+	proveedor: string;
 }
 
 export class FacturacionFormat {
@@ -43,12 +45,18 @@ export class FacturacionFormat {
 	}
 
 	static compras(compras: Array<ICompra>): Array<ICompraFormat> {
-		return compras.map((compra: ICompra) => ({
+		let result: Array<any> = compras.map((compra: ICompra) => ({
 			...compra,
 			fecha: formatDate(compra.fecha, true),
 			factura_numero: compra.factura_numero ? compra.factura_numero.toString() : '',
 			log: compra.log ? compra.log : '-'
 		}));
+		// Renombrar nombre_proveedor a proveedor
+		result = result.map(({ nombre_proveedor, ...rest }) => ({
+			...rest,
+			proveedor: nombre_proveedor
+		}));
+		return result;
 	}
 }
 

@@ -9,7 +9,7 @@
 	let compras = $derived(data.compras);
 	let f_compras = $derived(FacturacionFormat.compras(compras));
 	let rows = $state(200);
-	let sortColumns = ['fecha', 'numero_factura_proveedor', 'factura_numero', 'contabilizado', 'log'];
+	let sortColumns = ['fecha', 'proveedor', 'factura_proveedor', 'factura_numero', 'contabilizado', 'log'];
 
 	async function refresh() {
 		compras = await Compra.get_list({
