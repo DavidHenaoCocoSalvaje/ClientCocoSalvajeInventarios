@@ -5,15 +5,32 @@
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
 	import InputText from '$lib/components/InputText.svelte';
-	import { Venta, FacturacionFormat} from '$lib/routes/facturacion/index.js';
+	import Modal from '$lib/components/Modal.svelte';
+	import Loader from '$lib/components/Loader.svelte';
+	import { Venta, FacturacionFormat } from '$lib/routes/facturacion/index.js';
 
 	let { data } = $props();
-	let ventas = $derived(data.ventas);
+
+	let ventas: Awaited<ReturnType<typeof Venta.get_list>> = $state([]);
 	let f_ventas = $derived(FacturacionFormat.ventas(ventas));
 	let rows = $state(200);
 	let sortColumns = ['fecha', 'numero_pedido', 'pago', 'factura_numero', 'contabilizado', 'log'];
+	let loading = $state(true);
 
-	async function refresh() {
+	let showMessageModal = $state(false);
+	let messageModalTitle = $state('');
+	let messageModalContent = $state('');
+	let isMessageError = $state(false);
+
+	function showMessage(title: string, content: string, isError = false) {
+		messageModalTitle = title;
+		messageModalContent = content;
+		isMessageError = isError;
+		showMessageModal = true;
+	}
+
+	async function loadVentas() {
+		loading = true;
 		ventas = await Venta.get_list({
 			url: data.backendUrlCsr,
 			access_token: data.access_token,
@@ -21,12 +38,17 @@
 			limit: rows,
 			sort: SortDirection.DESC
 		});
+		loading = false;
+	}
+
+	async function refresh() {
+		await loadVentas();
 	}
 
 	let numero_pedido = $state('');
 	async function facturarVenta() {
 		if (!numero_pedido) {
-			alert('Por favor, ingrese un número de pedido.');
+			showMessage('Error', 'Por favor, ingrese un número de pedido.', true);
 			return;
 		}
 		const request = new CSRequest(data.backendUrlCsr);
@@ -37,9 +59,9 @@
 			params: [numero_pedido]
 		});
 		if (response) {
-			alert(`Pedido ${numero_pedido} facturado correctamente.`);
+			showMessage('Éxito', `Pedido ${numero_pedido} facturado correctamente.`);
 		} else {
-			alert(`Error al facturar el pedido ${numero_pedido}.`);
+			showMessage('Error', `Error al facturar el pedido ${numero_pedido}.`, true);
 		}
 	}
 
@@ -51,7 +73,18 @@
 			accessToken: data.access_token
 		});
 	}
+
+	$effect(() => {
+		loadVentas();
+	});
 </script>
+
+<Modal bind:showModal={showMessageModal}>
+	<div class="flex min-w-64 flex-col gap-4 p-2">
+		<h3 class="text-lg font-semibold" class:text-red-600={isMessageError}>{messageModalTitle}</h3>
+		<p class="text-gray-600">{messageModalContent}</p>
+	</div>
+</Modal>
 
 <Section>
 	<Title>Explorador de ventas</Title>
@@ -67,6 +100,8 @@
 	</div>
 </Section>
 
-{#if f_ventas}
+{#if loading}
+	<Loader message="Cargando ventas..." />
+{:else}
 	<DataGrid data={f_ventas} columns={sortColumns} bind:rows refresh_data={refresh} />
 {/if}

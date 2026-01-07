@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import Button from './Button.svelte';
 
 	let { showModal = $bindable(false), children }: { showModal: boolean; children?: Snippet } =
 		$props();
@@ -16,12 +15,10 @@
 	});
 
 	function close() {
-		// Al cerrar el dialog nativo, se dispara el evento 'close'
 		dialogElement?.close();
 	}
 
 	function onDialogClose() {
-		// Sincronizamos la prop cuando el dialog se cierra (por tecla ESC o método close)
 		showModal = false;
 	}
 
@@ -32,16 +29,24 @@
 	}
 </script>
 
-
 <dialog
 	bind:this={dialogElement}
 	onclose={onDialogClose}
 	onclick={onBackdropClick}
 	class="m-auto rounded-lg border border-gray-100 p-0 shadow-2xl backdrop:bg-black/50">
-	<div class="flex flex-col gap-4 bg-white p-6">
-		{@render children?.()}
-		<div class="flex justify-end">
-			<Button action={close} style="bg-teal-700 text-white hover:bg-teal-800">Cerrar</Button>
+	<div class="flex flex-col bg-white">
+		<div class="flex w-full justify-end px-3 pt-3">
+			<button
+			onclick={close}
+			class="border-none text-gray-400 outline-none transition-colors duration-200 hover:text-teal-600 focus:outline-none"
+			aria-label="Cerrar">
+				<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+		</div>
+		<div class="px-6 pb-6">
+			{@render children?.()}
 		</div>
 	</div>
 </dialog>
