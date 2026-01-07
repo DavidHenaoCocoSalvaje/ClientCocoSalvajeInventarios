@@ -21,6 +21,12 @@
             dest: "{{ remote_folder }}/.env"
             mode: "0600"
 
+      - name: Send credentials
+        ansible.builtin.copy:
+            src: "{{ playbook_dir }}/../credentials"
+            dest: "{{ remote_folder }}/credentials"
+            mode: "0600"
+
       - name: Send docker compose file
         ansible.builtin.copy:
             src: "{{ local_compose_path }}"
