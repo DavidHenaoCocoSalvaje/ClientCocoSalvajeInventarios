@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { CSRequest, SortDirection } from '$lib';
-	import Section from '$lib/components/Section.svelte';
+	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import DataGrid from '$lib/components/DataGrid.svelte';
@@ -86,7 +86,7 @@
 	</div>
 </Modal>
 
-<Section>
+<Section className="px-10 py-5 gap-5">
 	<Title>Explorador de ventas</Title>
 	<h2 class="w-full text-lg font-semibold">Ventas facturadas</h2>
 	<div class="justify-left flex w-full items-center gap-5">
@@ -98,10 +98,10 @@
 			bind:value={numero_pedido} />
 		<Button action={facturarVenta} style="bg-teal-700 text-white">Facturar pedido</Button>
 	</div>
+	{#if loading}
+		<Loader message="Cargando ventas..." />
+	{:else}
+		<DataGrid data={f_ventas} columns={sortColumns} bind:rows refresh_data={refresh} />
+	{/if}
 </Section>
 
-{#if loading}
-	<Loader message="Cargando ventas..." />
-{:else}
-	<DataGrid data={f_ventas} columns={sortColumns} bind:rows refresh_data={refresh} />
-{/if}

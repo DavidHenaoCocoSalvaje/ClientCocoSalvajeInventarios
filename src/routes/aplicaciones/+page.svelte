@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Section from '$lib/components/Section.svelte';
+	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import { jwtDecode } from 'jwt-decode';
 	import { onMount } from 'svelte';
@@ -24,7 +24,7 @@
 	}
 </script>
 
-<Section>
+<Section className="px-10 py-5 gap-5">
 	<Title>Aplicaciones y Servicios</Title>
 	<div class="w-full">
 		<p>Conecta aplicaciones externas.</p>

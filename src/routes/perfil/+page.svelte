@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Section from '$lib/components/Section.svelte';
+	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import InputText from '$lib/components/InputText.svelte';

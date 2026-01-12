@@ -14,7 +14,6 @@
 	import Modal from './Modal.svelte';
 	import Button from './Button.svelte';
 	import InputText from './InputText.svelte';
-	import RefreshSVG from './RefreshSVG.svelte';
 
 	interface Props {
 		data: Array<Record<string, any>>;

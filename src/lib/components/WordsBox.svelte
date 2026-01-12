@@ -3,7 +3,7 @@
 
 	let { words, filterWord = $bindable() }: { words: Array<string>; filterWord: string } = $props();
 
-	let filtredWords = $state(filtrarPalabras(words, ''));
+	let filtredWords = $derived(filtrarPalabras(words, filterWord));
 
 	function filtrarPalabras(words: Array<string>, filtro: string) {
 		if (!filtro) return words;
@@ -17,10 +17,7 @@
 		<InputText
 			bind:value={filterWord}
 			width="w-40"
-			placeholder="filtro"
-			onInput={(v: string) => {
-				filtredWords = filtrarPalabras(words, v);
-			}}></InputText>
+			placeholder="filtro"></InputText>
 		{#each filtredWords as word}
 			<span>{word}</span>
 		{/each}

@@ -170,6 +170,20 @@ export class User {
     }
 }
 
+export interface IRole {
+    id: number;
+    name: string;
+    description: string | null;
+    system: boolean;
+}
+
+export interface IGroup {
+    id: number;
+    name: string;
+    description: string | null;
+    system: boolean;
+}
+
 export class UserPermissions {
     static async getAll({
         url,
@@ -184,6 +198,57 @@ export class UserPermissions {
         return await request.get<IPermission[]>({
             primaryRoute: '/user-permissions',
             path: `/${userId}/permissions/all`,
+            accessToken
+        });
+    }
+
+    static async getDirect({
+        url,
+        accessToken,
+        userId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.get<IPermission[]>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/permissions`,
+            accessToken
+        });
+    }
+
+    static async getRoles({
+        url,
+        accessToken,
+        userId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.get<IRole[]>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/roles`,
+            accessToken
+        });
+    }
+
+    static async getGroups({
+        url,
+        accessToken,
+        userId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.get<IGroup[]>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/groups`,
             accessToken
         });
     }
@@ -207,6 +272,103 @@ export class UserPermissions {
             body: { permission_id: permissionId }
         });
     }
+
+    static async unassign({
+        url,
+        accessToken,
+        userId,
+        permissionId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+        permissionId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.delete<void>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/permissions/${permissionId}`,
+            accessToken
+        });
+    }
+
+    static async assignRole({
+        url,
+        accessToken,
+        userId,
+        roleId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+        roleId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.post<Record<string, string>>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/roles`,
+            accessToken,
+            body: { role_id: roleId }
+        });
+    }
+
+    static async unassignRole({
+        url,
+        accessToken,
+        userId,
+        roleId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+        roleId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.delete<void>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/roles/${roleId}`,
+            accessToken
+        });
+    }
+
+    static async assignGroup({
+        url,
+        accessToken,
+        userId,
+        groupId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+        groupId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.post<Record<string, string>>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/groups`,
+            accessToken,
+            body: { group_id: groupId }
+        });
+    }
+
+    static async unassignGroup({
+        url,
+        accessToken,
+        userId,
+        groupId
+    }: {
+        url: string;
+        accessToken: string;
+        userId: number;
+        groupId: number;
+    }) {
+        const request = new CSRequest(url);
+        return await request.delete<void>({
+            primaryRoute: '/user-permissions',
+            path: `/${userId}/groups/${groupId}`,
+            accessToken
+        });
+    }
 }
 
 export class Permission {
@@ -225,3 +387,38 @@ export class Permission {
         });
     }
 }
+
+export class Role {
+    static async getAll({
+        url,
+        accessToken
+    }: {
+        url: string;
+        accessToken: string;
+    }) {
+        const request = new CSRequest(url);
+        return await request.get<IRole[]>({
+            primaryRoute: '/permissions',
+            path: '/roles',
+            accessToken
+        });
+    }
+}
+
+export class Group {
+    static async getAll({
+        url,
+        accessToken
+    }: {
+        url: string;
+        accessToken: string;
+    }) {
+        const request = new CSRequest(url);
+        return await request.get<IGroup[]>({
+            primaryRoute: '/permissions',
+            path: '/groups',
+            accessToken
+        });
+    }
+}
+

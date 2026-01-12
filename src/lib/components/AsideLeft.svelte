@@ -5,7 +5,7 @@
 	let { sections, root }: { sections: Array<Section>; root: string } = $props();
 </script>
 
-<!-- shring-0 evita que el elemento se compima-->
+<!-- shring-0 evita que el elemento se comprima-->
 <aside
 	class="sticky top-0 left-0 h-screen w-50 shrink-0 border-r border-r-gray-400 px-10 pt-19 pb-5 font-semibold">
 	<div class="flex flex-col gap-2">
