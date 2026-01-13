@@ -6,7 +6,7 @@
       local_env_path: "{{ playbook_dir }}/../.env.production"
       local_compose_path: "{{ playbook_dir }}/../docker-compose.yml"
       image_name: "integraciones-client"
-      remote_folder: "/home/coco/images/frontend/integraciones"
+      remote_folder: "/home/coco/ClientIntegraciones"
 
   tasks:
       - name: Send docker-image
@@ -24,7 +24,7 @@
       - name: Send credentials
         ansible.builtin.copy:
             src: "{{ playbook_dir }}/../credentials"
-            dest: "{{ remote_folder }}/credentials"
+            dest: "{{ remote_folder }}"
             mode: "0600"
 
       - name: Send docker compose file

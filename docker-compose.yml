@@ -10,6 +10,8 @@ services:
     restart: unless-stopped
     networks:
       - coco-network
+    volumes:
+      - ./credentials:/home/coco/app/credentials
 
 networks:
   coco-network:

@@ -11,16 +11,21 @@ RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which 
 ENV PNPM_HOME="/root/.local/share/pnpm"
 ENV PATH="${PNPM_HOME}:${PATH}"
 
-# Copia los archivos de dependencias e instala solo las de producción
-COPY package.json pnpm-lock.yaml ./ 
-RUN pnpm install --prod
-
 # Copia la aplicación que fue compilada localmente en el directorio ./build
-COPY build/ ./
+COPY build/ /home/coco/app
 
-# Crea el usuario 'coco' y le transfiere la propiedad de la aplicación
-RUN adduser --disabled-password --gecos '' coco && \
-    chown -R coco:coco /app
+# Copia los archivos de dependencias
+COPY package.json /home/coco/app
+
+# Crea el usuario 'coco' con UID/GID específicos y le transfiere la propiedad de la aplicación
+RUN adduser --disabled-password --gecos '' --uid 1001 coco && \
+    chown -R coco:coco /home/coco/
+
+# Esteblece el directorio de trabajo
+WORKDIR /home/coco/app
+
+# Instala las dependencias
+RUN pnpm install --prod
 
 # Cambia al usuario 'coco' para la ejecución
 USER coco
