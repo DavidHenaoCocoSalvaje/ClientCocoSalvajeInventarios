@@ -425,7 +425,7 @@
 		{:else}
 			<DataGrid
 				data={directPermissions}
-				columns={['id', 'slug', 'access_mode', 'resource']}
+				columns={['slug', 'access_mode', 'resource']}
 				refresh_data={loadUserPermissions}
 				showPagination={false}
 				showRowCount={false}>
@@ -457,7 +457,7 @@
 		{:else}
 			<DataGrid
 				data={userRoles}
-				columns={['id', 'name', 'description']}
+				columns={['name', 'description']}
 				refresh_data={loadUserPermissions}
 				showPagination={false}
 				showRowCount={false}>
@@ -526,7 +526,7 @@
 		{:else}
 			<DataGrid
 				data={userGroups}
-				columns={['id', 'name', 'description']}
+				columns={['name', 'description']}
 				refresh_data={loadUserPermissions}
 				showPagination={false}
 				showRowCount={false}>

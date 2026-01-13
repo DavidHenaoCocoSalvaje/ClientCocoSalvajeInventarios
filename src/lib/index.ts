@@ -110,13 +110,26 @@ export class CSRequest {
 				body: body ? JSON.stringify(body) : undefined
 			});
 
-			const json = await response.json();
+			// Respuestas 204 No Content no tienen body
+			if (response.status === 204) {
+				return {
+					ok: true,
+					status: response.status,
+					data: undefined as T
+				};
+			}
+
+			let json: unknown = null;
+			const contentType = response.headers.get('content-type');
+			if (contentType?.includes('application/json')) {
+				json = await response.json();
+			}
 
 			if (!response.ok) {
 				return {
 					ok: false,
 					status: response.status,
-					error: getErrorMessage(response.status, json?.detail)
+					error: getErrorMessage(response.status, (json as Record<string, string>)?.detail)
 				};
 			}
 

@@ -20,7 +20,7 @@
 	let users: IUser[] = $state([]);
 	let formattedUsers = $derived(UserFormat.users(users));
 	let rows = $state(100);
-	let columns = ['id', 'username', 'is_active', 'created_at'];
+	let columns = ['username', 'is_active', 'created_at'];
 
 	let showCreateModal = $state(false);
 	let showMessageModal = $state(false);
