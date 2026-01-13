@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CSRequest, SortDirection } from '$lib';
+	import { CSRequest, SortDirection, getMessageType, type MessageType } from '$lib';
 	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import Button from '$lib/components/Button.svelte';
@@ -7,15 +7,18 @@
 	import InputText from '$lib/components/InputText.svelte';
 	import Modal from '$lib/components/Modal.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import Message from '$lib/components/Message.svelte';
 	import { Venta, FacturacionFormat } from '$lib/routes/facturacion/index.js';
 
 	let { data } = $props();
 
-	let ventas: Awaited<ReturnType<typeof Venta.get_list>> = $state([]);
-	let f_ventas = $derived(FacturacionFormat.ventas(ventas));
+	let ventas: Awaited<ReturnType<typeof Venta.get_list>>['data'] = $state([]);
+	let f_ventas = $derived(FacturacionFormat.ventas(ventas || []));
 	let rows = $state(200);
 	let sortColumns = ['fecha', 'numero_pedido', 'pago', 'factura_numero', 'contabilizado', 'log'];
 	let loading = $state(true);
+	let error = $state('');
+	let errorType: MessageType = $state('error');
 
 	let showMessageModal = $state(false);
 	let messageModalTitle = $state('');
@@ -31,13 +34,20 @@
 
 	async function loadVentas() {
 		loading = true;
-		ventas = await Venta.get_list({
+		error = '';
+		const response = await Venta.get_list({
 			url: data.backendUrlCsr,
 			access_token: data.access_token,
 			skip: 0,
 			limit: rows,
 			sort: SortDirection.DESC
 		});
+		if (response.ok) {
+			ventas = response.data;
+		} else {
+			error = response.error || 'Error desconocido';
+			errorType = getMessageType(response.status);
+		}
 		loading = false;
 	}
 
@@ -58,10 +68,10 @@
 			accessToken: data.access_token,
 			params: [numero_pedido]
 		});
-		if (response) {
+		if (response.ok) {
 			showMessage('Éxito', `Pedido ${numero_pedido} facturado correctamente.`);
 		} else {
-			showMessage('Error', `Error al facturar el pedido ${numero_pedido}.`, true);
+			showMessage('Error', response.error || `Error al facturar el pedido ${numero_pedido}.`, true);
 		}
 	}
 
@@ -100,6 +110,8 @@
 	</div>
 	{#if loading}
 		<Loader message="Cargando ventas..." />
+	{:else if error}
+		<Message title={errorType === 'info' ? 'Información' : 'Error'} message={error} type={errorType} />
 	{:else}
 		<DataGrid data={f_ventas} columns={sortColumns} bind:rows refresh_data={refresh} />
 	{/if}

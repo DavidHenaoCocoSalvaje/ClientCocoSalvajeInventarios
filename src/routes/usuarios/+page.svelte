@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SortDirection } from '$lib';
+	import { SortDirection, getMessageType, type MessageType } from '$lib';
 	import { goto } from '$app/navigation';
 	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
@@ -8,6 +8,7 @@
 	import Modal from '$lib/components/Modal.svelte';
 	import InputText from '$lib/components/InputText.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import Message from '$lib/components/Message.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import ShieldIcon from '$lib/components/svg/ShieldIcon.svelte';
 	import RefreshIcon from '$lib/components/svg/RefreshIcon.svelte';
@@ -33,6 +34,8 @@
 	let newUsername = $state('');
 	let selectedUser: IUser | null = $state(null);
 	let loading = $state(true);
+	let error = $state('');
+	let errorType: MessageType = $state('error');
 
 	function showMessage(title: string, content: string, isError = false) {
 		messageModalTitle = title;
@@ -43,13 +46,20 @@
 
 	async function loadUsers() {
 		loading = true;
-		users = await User.getList({
+		error = '';
+		const response = await User.getList({
 			url: data.backendUrlCsr,
 			accessToken: data.access_token,
 			skip: 0,
 			limit: rows,
 			sort: SortDirection.DESC
 		});
+		if (response.ok) {
+			users = response.data || [];
+		} else {
+			error = response.error || 'Error desconocido';
+			errorType = getMessageType(response.status);
+		}
 		loading = false;
 	}
 
@@ -63,13 +73,13 @@
 			accessToken: data.access_token,
 			username: newUsername.trim()
 		});
-		if (response?.user) {
+		if (response.ok && response.data?.user) {
 			showCreateModal = false;
 			newUsername = '';
-			showMessage('Usuario Creado', `Contraseña temporal: ${response.temp_password}`);
+			showMessage('Usuario Creado', `Contraseña temporal: ${response.data.temp_password}`);
 			await loadUsers();
 		} else {
-			showMessage('Error', 'Error al crear usuario', true);
+			showMessage('Error', response.error || 'Error al crear usuario', true);
 		}
 	}
 
@@ -86,11 +96,11 @@
 			accessToken: data.access_token,
 			userId: selectedUser.id
 		});
-		if (response) {
+		if (response.ok) {
 			showMessage('Éxito', 'Usuario eliminado correctamente');
 			await loadUsers();
 		} else {
-			showMessage('Error', 'Error al eliminar usuario', true);
+			showMessage('Error', response.error || 'Error al eliminar usuario', true);
 		}
 		selectedUser = null;
 	}
@@ -108,10 +118,10 @@
 			accessToken: data.access_token,
 			userId: selectedUser.id
 		});
-		if (response?.new_password) {
-			showMessage('Contraseña Restablecida', `Nueva contraseña: ${response.new_password}`);
+		if (response.ok && response.data?.new_password) {
+			showMessage('Contraseña Restablecida', `Nueva contraseña: ${response.data.new_password}`);
 		} else {
-			showMessage('Error', 'Error al restablecer contraseña', true);
+			showMessage('Error', response.error || 'Error al restablecer contraseña', true);
 		}
 		selectedUser = null;
 	}
@@ -181,6 +191,8 @@
 	</div>
 	{#if loading}
 		<Loader message="Cargando usuarios..." />
+	{:else if error}
+		<Message title={errorType === 'info' ? 'Información' : 'Error'} message={error} type={errorType} />
 	{:else}
 		<DataGrid data={formattedUsers} {columns} refresh_data={loadUsers} showPagination={false} showRowCount={false}>
 			{#snippet actions(row)}

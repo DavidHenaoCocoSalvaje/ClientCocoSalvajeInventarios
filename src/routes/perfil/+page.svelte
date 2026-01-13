@@ -16,10 +16,13 @@
 	let isError = $state(false);
 
 	async function loadUser() {
-		currentUser = await User.getMe({
+		const response = await User.getMe({
 			url: data.backendUrlCsr,
 			accessToken: data.access_token
 		});
+		if (response.ok) {
+			currentUser = response.data || null;
+		}
 	}
 
 	async function changePassword() {
@@ -53,14 +56,14 @@
 				newPassword
 			});
 
-			if (response?.id) {
+			if (response.ok && response.data?.id) {
 				message = 'Contraseña actualizada correctamente';
 				isError = false;
 				currentPassword = '';
 				newPassword = '';
 				confirmPassword = '';
 			} else {
-				message = 'Error al actualizar la contraseña';
+				message = response.error || 'Error al actualizar la contraseña';
 				isError = true;
 			}
 		} catch {

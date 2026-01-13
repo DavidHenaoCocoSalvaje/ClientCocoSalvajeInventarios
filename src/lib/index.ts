@@ -1,5 +1,11 @@
 type TBody = Record<string, object | string | number | boolean | undefined | null> | FormData;
 
+export interface ApiResponse<T> {
+	ok: boolean;
+	status: number;
+	data?: T;
+	error?: string;
+}
 
 export interface RequestOptions {
 	method: string;
@@ -28,6 +34,25 @@ export interface NoBodyMethodOptions {
 	accessToken: string;
 	params?: string[];
 	query?: Record<string, string>;
+}
+
+function getErrorMessage(status: number, detail?: string): string {
+	if (detail) return detail;
+	switch (status) {
+		case 401: return 'No autorizado. Tu sesión puede haber expirado.';
+		case 403: return 'No tienes permisos para acceder a este recurso.';
+		case 404: return 'Recurso no encontrado.';
+		case 500: return 'Error interno del servidor.';
+		default: return `Error del servidor (${status})`;
+	}
+}
+
+export type MessageType = 'error' | 'info' | 'warning';
+
+export function getMessageType(status: number): MessageType {
+	if (status === 401 || status === 403) return 'info';
+	if (status >= 400 && status < 500) return 'warning';
+	return 'error';
 }
 
 export class CSRequest {
@@ -71,20 +96,42 @@ export class CSRequest {
 		params,
 		query,
 		body
-	}: RequestOptions): Promise<T> {
+	}: RequestOptions): Promise<ApiResponse<T>> {
 		const url = this.buildUrl({ host: primaryRoute, path, params, query });
 
-		const response = await fetch(url, {
-			method,
-			cache: 'no-cache',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${accessToken}`
-			},
-			body: body ? JSON.stringify(body) : undefined
-		});
+		try {
+			const response = await fetch(url, {
+				method,
+				cache: 'no-cache',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${accessToken}`
+				},
+				body: body ? JSON.stringify(body) : undefined
+			});
 
-		return response.json();
+			const json = await response.json();
+
+			if (!response.ok) {
+				return {
+					ok: false,
+					status: response.status,
+					error: getErrorMessage(response.status, json?.detail)
+				};
+			}
+
+			return {
+				ok: true,
+				status: response.status,
+				data: json as T
+			};
+		} catch (err) {
+			return {
+				ok: false,
+				status: 0,
+				error: 'Error de conexión. Verifica tu red.'
+			};
+		}
 	}
 
 	async get<T>({
@@ -93,7 +140,7 @@ export class CSRequest {
 		accessToken,
 		params,
 		query
-	}: NoBodyMethodOptions): Promise<T> {
+	}: NoBodyMethodOptions): Promise<ApiResponse<T>> {
 		return this.request<T>({
 			method: 'GET',
 			primaryRoute,
@@ -111,7 +158,7 @@ export class CSRequest {
 		params,
 		query,
 		body = {}
-	}: MethodOptions): Promise<T> {
+	}: MethodOptions): Promise<ApiResponse<T>> {
 		return this.request<T>({
 			method: 'POST',
 			primaryRoute,
@@ -130,7 +177,7 @@ export class CSRequest {
 		params,
 		query,
 		body = {}
-	}: MethodOptions): Promise<T> {
+	}: MethodOptions): Promise<ApiResponse<T>> {
 		return this.request<T>({
 			method: 'PUT',
 			primaryRoute,
@@ -148,7 +195,7 @@ export class CSRequest {
 		accessToken,
 		params,
 		query
-	}: NoBodyMethodOptions): Promise<T> {
+	}: NoBodyMethodOptions): Promise<ApiResponse<T>> {
 		return this.request<T>({
 			method: 'DELETE',
 			primaryRoute,
@@ -166,7 +213,7 @@ export class CSRequest {
 		params,
 		query,
 		body = {}
-	}: MethodOptions): Promise<T> {
+	}: MethodOptions): Promise<ApiResponse<T>> {
 		return this.request<T>({
 			method: 'PATCH',
 			primaryRoute,
@@ -184,7 +231,7 @@ export class CSRequest {
 		accessToken,
 		params,
 		query
-	}: NoBodyMethodOptions): Promise<T> {
+	}: NoBodyMethodOptions): Promise<ApiResponse<T>> {
 		return this.request<T>({
 			method: 'OPTIONS',
 			primaryRoute,

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { SortDirection } from '$lib';
+	import { SortDirection, getMessageType, type MessageType } from '$lib';
 	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import Subtitle from '$lib/components/Subtitle.svelte';
@@ -9,6 +9,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import Select from '$lib/components/Select.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import Message from '$lib/components/Message.svelte';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import TrashIcon from '$lib/components/svg/TrashIcon.svelte';
 	import PlusIcon from '$lib/components/svg/PlusIcon.svelte';
@@ -51,6 +52,8 @@
 	// Estados de carga
 	let loadingUsers = $state(true);
 	let loadingPermissions = $state(false);
+	let error = $state('');
+	let errorType: MessageType = $state('error');
 
 	// Modales
 	let showAssignPermissionModal = $state(false);
@@ -86,13 +89,23 @@
 
 	async function loadUsers() {
 		loadingUsers = true;
-		users = await User.getList({
+		error = '';
+		const response = await User.getList({
 			url: data.backendUrlCsr,
 			accessToken: data.access_token,
 			skip: 0,
 			limit: 1000,
 			sort: SortDirection.ASC
 		});
+
+		if (!response.ok) {
+			error = response.error || 'Error desconocido';
+			errorType = getMessageType(response.status);
+			loadingUsers = false;
+			return;
+		}
+
+		users = response.data || [];
 
 		const urlUserId = parseInt(page.url.searchParams.get('user_id') || '0');
 		if (urlUserId && users.some((u) => u.id === urlUserId)) {
@@ -113,7 +126,7 @@
 		if (!selectedUserId) return;
 		loadingPermissions = true;
 
-		const [permissions, roles, groups] = await Promise.all([
+		const [permissionsRes, rolesRes, groupsRes] = await Promise.all([
 			UserPermissions.getDirect({
 				url: data.backendUrlCsr,
 				accessToken: data.access_token,
@@ -131,9 +144,9 @@
 			})
 		]);
 
-		directPermissions = permissions || [];
-		userRoles = roles || [];
-		userGroups = groups || [];
+		directPermissions = permissionsRes.data || [];
+		userRoles = rolesRes.data || [];
+		userGroups = groupsRes.data || [];
 
 		// Cargar detalles de roles y grupos
 		await loadRoleDetails();
@@ -149,7 +162,7 @@
 
 		await Promise.all(
 			userRoles.map(async (role) => {
-				const [perms, grps] = await Promise.all([
+				const [permsRes, grpsRes] = await Promise.all([
 					Role.getPermissions({
 						url: data.backendUrlCsr,
 						accessToken: data.access_token,
@@ -161,19 +174,20 @@
 						roleId: role.id
 					})
 				]);
-				newRolePermissions[role.id] = perms || [];
-				newRoleGroups[role.id] = grps || [];
+				newRolePermissions[role.id] = permsRes.data || [];
+				const roleGroups = grpsRes.data || [];
+				newRoleGroups[role.id] = roleGroups;
 
 				// Cargar permisos de cada grupo de este rol
 				newRoleGroupPermissions[role.id] = {};
 				await Promise.all(
-					(grps || []).map(async (group) => {
-						const groupPerms = await Group.getPermissions({
+					roleGroups.map(async (group: IGroup) => {
+						const groupPermsRes = await Group.getPermissions({
 							url: data.backendUrlCsr,
 							accessToken: data.access_token,
 							groupId: group.id
 						});
-						newRoleGroupPermissions[role.id][group.id] = groupPerms || [];
+						newRoleGroupPermissions[role.id][group.id] = groupPermsRes.data || [];
 					})
 				);
 			})
@@ -189,12 +203,12 @@
 
 		await Promise.all(
 			userGroups.map(async (group) => {
-				const perms = await Group.getPermissions({
+				const permsRes = await Group.getPermissions({
 					url: data.backendUrlCsr,
 					accessToken: data.access_token,
 					groupId: group.id
 				});
-				newGroupPermissions[group.id] = perms || [];
+				newGroupPermissions[group.id] = permsRes.data || [];
 			})
 		);
 
@@ -202,28 +216,31 @@
 	}
 
 	async function openAssignPermissionModal() {
-		allPermissions = await Permission.getAll({
+		const response = await Permission.getAll({
 			url: data.backendUrlCsr,
 			accessToken: data.access_token
 		});
+		allPermissions = response.data || [];
 		selectedPermissionId = allPermissions[0]?.id || 0;
 		showAssignPermissionModal = true;
 	}
 
 	async function openAssignRoleModal() {
-		allRoles = await Role.getAll({
+		const response = await Role.getAll({
 			url: data.backendUrlCsr,
 			accessToken: data.access_token
 		});
+		allRoles = response.data || [];
 		selectedRoleId = allRoles[0]?.id || 0;
 		showAssignRoleModal = true;
 	}
 
 	async function openAssignGroupModal() {
-		allGroups = await Group.getAll({
+		const response = await Group.getAll({
 			url: data.backendUrlCsr,
 			accessToken: data.access_token
 		});
+		allGroups = response.data || [];
 		selectedGroupId = allGroups[0]?.id || 0;
 		showAssignGroupModal = true;
 	}
@@ -380,6 +397,8 @@
 	<Title>Gestión de Permisos</Title>
 	{#if loadingUsers}
 		<Loader message="Cargando usuarios..." />
+	{:else if error}
+		<Message title={errorType === 'info' ? 'Información' : 'Error'} message={error} type={errorType} />
 	{:else}
 		<!-- Selector de usuario fijo -->
 		<div class="flex w-full items-center gap-4">
