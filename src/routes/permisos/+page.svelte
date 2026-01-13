@@ -29,12 +29,19 @@
 	// Estado para el usuario seleccionado
 	let users: IUser[] = $state([]);
 	let selectedUserId: number = $state(0);
+	let selectedUsername = $derived(users.find((u) => u.id === selectedUserId)?.username || '');
 	let userOptions = $derived(users.map((u) => ({ value: u.id, text: u.username })));
 
-	// Datos de permisos
+	// Datos de permisos del usuario
 	let directPermissions: IPermission[] = $state([]);
 	let userRoles: IRole[] = $state([]);
 	let userGroups: IGroup[] = $state([]);
+
+	// Datos de permisos y grupos detallados por rol/grupo
+	let rolePermissions: Record<number, IPermission[]> = $state({});
+	let roleGroups: Record<number, IGroup[]> = $state({});
+	let roleGroupPermissions: Record<number, Record<number, IPermission[]>> = $state({});
+	let groupPermissions: Record<number, IPermission[]> = $state({});
 
 	// Datos disponibles para asignar
 	let allPermissions: IPermission[] = $state([]);
@@ -127,7 +134,71 @@
 		directPermissions = permissions || [];
 		userRoles = roles || [];
 		userGroups = groups || [];
+
+		// Cargar detalles de roles y grupos
+		await loadRoleDetails();
+		await loadGroupDetails();
+
 		loadingPermissions = false;
+	}
+
+	async function loadRoleDetails() {
+		const newRolePermissions: Record<number, IPermission[]> = {};
+		const newRoleGroups: Record<number, IGroup[]> = {};
+		const newRoleGroupPermissions: Record<number, Record<number, IPermission[]>> = {};
+
+		await Promise.all(
+			userRoles.map(async (role) => {
+				const [perms, grps] = await Promise.all([
+					Role.getPermissions({
+						url: data.backendUrlCsr,
+						accessToken: data.access_token,
+						roleId: role.id
+					}),
+					Role.getGroups({
+						url: data.backendUrlCsr,
+						accessToken: data.access_token,
+						roleId: role.id
+					})
+				]);
+				newRolePermissions[role.id] = perms || [];
+				newRoleGroups[role.id] = grps || [];
+
+				// Cargar permisos de cada grupo de este rol
+				newRoleGroupPermissions[role.id] = {};
+				await Promise.all(
+					(grps || []).map(async (group) => {
+						const groupPerms = await Group.getPermissions({
+							url: data.backendUrlCsr,
+							accessToken: data.access_token,
+							groupId: group.id
+						});
+						newRoleGroupPermissions[role.id][group.id] = groupPerms || [];
+					})
+				);
+			})
+		);
+
+		rolePermissions = newRolePermissions;
+		roleGroups = newRoleGroups;
+		roleGroupPermissions = newRoleGroupPermissions;
+	}
+
+	async function loadGroupDetails() {
+		const newGroupPermissions: Record<number, IPermission[]> = {};
+
+		await Promise.all(
+			userGroups.map(async (group) => {
+				const perms = await Group.getPermissions({
+					url: data.backendUrlCsr,
+					accessToken: data.access_token,
+					groupId: group.id
+				});
+				newGroupPermissions[group.id] = perms || [];
+			})
+		);
+
+		groupPermissions = newGroupPermissions;
 	}
 
 	async function openAssignPermissionModal() {
@@ -320,82 +391,152 @@
 		<Loader message="Cargando permisos..." />
 	{:else if selectedUserId}
 		<!-- Permisos Directos -->
-		<Subtitle>Permisos Directos</Subtitle>
-		<DataGrid
-			data={directPermissions}
-			columns={['id', 'slug', 'access_mode', 'resource']}
-			refresh_data={loadUserPermissions}
-			showPagination={false}
-			showRowCount={false}>
-			{#snippet actions(row)}
-				<Tooltip text="Asignar permiso">
-					<button
-						onclick={openAssignPermissionModal}
-						class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-green-600">
-						<PlusIcon class="h-4 w-4" />
-					</button>
-				</Tooltip>
-				<Tooltip text="Desasignar">
-					<button
-						onclick={() => unassignPermission(row)}
-						class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-red-600">
-						<TrashIcon class="h-4 w-4" />
-					</button>
-				</Tooltip>
-			{/snippet}
-		</DataGrid>
+		<div class="flex items-center gap-3">
+			<Subtitle>Permisos Directos</Subtitle>
+			<Tooltip text="Asignar permiso">
+				<button
+					onclick={openAssignPermissionModal}
+					class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-green-600">
+					<PlusIcon class="h-5 w-5" />
+				</button>
+			</Tooltip>
+		</div>
+		{#if directPermissions.length === 0}
+			<p class="text-gray-500 italic">No hay permisos directos asignados a {selectedUsername}</p>
+		{:else}
+			<DataGrid
+				data={directPermissions}
+				columns={['id', 'slug', 'access_mode', 'resource']}
+				refresh_data={loadUserPermissions}
+				showPagination={false}
+				showRowCount={false}>
+				{#snippet actions(row)}
+					<Tooltip text="Desasignar">
+						<button
+							onclick={() => unassignPermission(row)}
+							class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-red-600">
+							<TrashIcon class="h-4 w-4" />
+						</button>
+					</Tooltip>
+				{/snippet}
+			</DataGrid>
+		{/if}
 	
 		<!-- Roles -->
-		<Subtitle>Roles</Subtitle>
-		<DataGrid
-			data={userRoles}
-			columns={['id', 'name', 'description']}
-			refresh_data={loadUserPermissions}
-			showPagination={false}
-			showRowCount={false}>
-			{#snippet actions(row)}
-				<Tooltip text="Asignar rol">
-					<button
-						onclick={openAssignRoleModal}
-						class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-green-600">
-						<PlusIcon class="h-4 w-4" />
-					</button>
-				</Tooltip>
-				<Tooltip text="Desasignar">
-					<button
-						onclick={() => unassignRole(row)}
-						class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-red-600">
-						<TrashIcon class="h-4 w-4" />
-					</button>
-				</Tooltip>
-			{/snippet}
-		</DataGrid>
+		<div class="flex items-center gap-3">
+			<Subtitle>Roles</Subtitle>
+			<Tooltip text="Asignar rol">
+				<button
+					onclick={openAssignRoleModal}
+					class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-green-600">
+					<PlusIcon class="h-5 w-5" />
+				</button>
+			</Tooltip>
+		</div>
+		{#if userRoles.length === 0}
+			<p class="text-gray-500 italic">No hay roles asignados a {selectedUsername}</p>
+		{:else}
+			<DataGrid
+				data={userRoles}
+				columns={['id', 'name', 'description']}
+				refresh_data={loadUserPermissions}
+				showPagination={false}
+				showRowCount={false}>
+				{#snippet actions(row)}
+					<Tooltip text="Desasignar">
+						<button
+							onclick={() => unassignRole(row)}
+							class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-red-600">
+							<TrashIcon class="h-4 w-4" />
+						</button>
+					</Tooltip>
+				{/snippet}
+			</DataGrid>
+
+			<!-- Detalles de cada rol -->
+			{#each userRoles as role (role.id)}
+				<div class="ml-6 border-l-2 border-teal-300 pl-4">
+					<p class="mb-2 text-sm font-medium text-teal-700">Permisos del Rol: {role.name}</p>
+					{#if (rolePermissions[role.id] || []).length === 0}
+						<p class="text-sm italic text-gray-400">Sin permisos directos</p>
+					{:else}
+						<DataGrid
+							data={rolePermissions[role.id] || []}
+							columns={['slug', 'access_mode', 'resource']}
+							showPagination={false}
+							showRowCount={false} />
+					{/if}
+
+					<p class="mb-2 mt-3 text-sm font-medium text-teal-700">Grupos del Rol: {role.name}</p>
+					{#if (roleGroups[role.id] || []).length === 0}
+						<p class="text-sm italic text-gray-400">Sin grupos asignados</p>
+					{:else}
+						{#each roleGroups[role.id] || [] as group (group.id)}
+							<div class="ml-4 border-l border-gray-300 pl-3 mb-3">
+								<p class="text-sm font-medium text-gray-700">{group.name}</p>
+								<p class="text-xs text-gray-500 mb-2">{group.description || ''}</p>
+								{#if ((roleGroupPermissions[role.id] || {})[group.id] || []).length === 0}
+									<p class="text-xs italic text-gray-400">Sin permisos</p>
+								{:else}
+									<DataGrid
+										data={(roleGroupPermissions[role.id] || {})[group.id] || []}
+										columns={['slug', 'access_mode', 'resource']}
+										showPagination={false}
+										showRowCount={false} />
+								{/if}
+							</div>
+						{/each}
+					{/if}
+				</div>
+			{/each}
+		{/if}
 	
 		<!-- Grupos -->
-		<Subtitle>Grupos</Subtitle>
-		<DataGrid
-			data={userGroups}
-			columns={['id', 'name', 'description']}
-			refresh_data={loadUserPermissions}
-			showPagination={false}
-			showRowCount={false}>
-			{#snippet actions(row)}
-				<Tooltip text="Asignar grupo">
-					<button
-						onclick={openAssignGroupModal}
-						class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-green-600">
-						<PlusIcon class="h-4 w-4" />
-					</button>
-				</Tooltip>
-				<Tooltip text="Desasignar">
-					<button
-						onclick={() => unassignGroup(row)}
-						class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-red-600">
-						<TrashIcon class="h-4 w-4" />
-					</button>
-				</Tooltip>
-			{/snippet}
-		</DataGrid>
+		<div class="flex items-center gap-3">
+			<Subtitle>Grupos</Subtitle>
+			<Tooltip text="Asignar grupo">
+				<button
+					onclick={openAssignGroupModal}
+					class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-green-600">
+					<PlusIcon class="h-5 w-5" />
+				</button>
+			</Tooltip>
+		</div>
+		{#if userGroups.length === 0}
+			<p class="text-gray-500 italic">No hay grupos asignados a {selectedUsername}</p>
+		{:else}
+			<DataGrid
+				data={userGroups}
+				columns={['id', 'name', 'description']}
+				refresh_data={loadUserPermissions}
+				showPagination={false}
+				showRowCount={false}>
+				{#snippet actions(row)}
+					<Tooltip text="Desasignar">
+						<button
+							onclick={() => unassignGroup(row)}
+							class="rounded p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-red-600">
+							<TrashIcon class="h-4 w-4" />
+						</button>
+					</Tooltip>
+				{/snippet}
+			</DataGrid>
+
+			<!-- Detalles de cada grupo -->
+			{#each userGroups as group (group.id)}
+				<div class="ml-6 border-l-2 border-teal-300 pl-4">
+					<p class="mb-2 text-sm font-medium text-teal-700">Permisos del Grupo: {group.name}</p>
+					{#if (groupPermissions[group.id] || []).length === 0}
+						<p class="text-sm italic text-gray-400">Sin permisos</p>
+					{:else}
+						<DataGrid
+							data={groupPermissions[group.id] || []}
+							columns={['slug', 'access_mode', 'resource']}
+							showPagination={false}
+							showRowCount={false} />
+					{/if}
+				</div>
+			{/each}
+		{/if}
 	{/if}
 </Section>
-
