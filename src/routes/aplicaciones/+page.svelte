@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { CSRequest } from '$lib';
 	import Section from '$lib/components/MainSection.svelte';
 	import Title from '$lib/components/Title.svelte';
 	import { jwtDecode } from 'jwt-decode';
@@ -7,10 +8,26 @@
 
 	// Estado de apps conectadas
 	let connectedApps = $state<string[]>([]);
+	let loading = $state(true);
 
-	onMount(() => {
-		// Cargar apps conectadas desde localStorage
-		connectedApps = JSON.parse(localStorage.getItem('connectedApps') || '[]');
+	async function checkConnection(app: string) {
+		const request = new CSRequest(data.backendUrlCsr);
+		const response = await request.get<{ connected: boolean }>({
+			primaryRoute: '/oauth',
+			path: `/${app}/connected`,
+			accessToken: data.access_token
+		});
+
+		if (response.ok && response.data?.connected) {
+			connectedApps = [...connectedApps, app];
+		}
+	}
+
+	onMount(async () => {
+		loading = true;
+		const appsToCheck = ['gmail'];
+		await Promise.all(appsToCheck.map(app => checkConnection(app)));
+		loading = false;
 	});
 
 	// Verificar si una app está conectada
