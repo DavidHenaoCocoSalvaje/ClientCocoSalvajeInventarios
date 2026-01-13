@@ -132,7 +132,7 @@
 </Modal>
 
 <div class="flex w-full flex-col gap-5 rounded-md border border-gray-300 p-5">
-	<div class="h-140 w-full overflow-auto">
+	<div class="max-h-140 w-full overflow-auto">
 		<table class="w-full text-center">
 			<thead class="sticky top-0 z-10 bg-white">
 				<tr>
