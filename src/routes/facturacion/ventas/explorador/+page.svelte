@@ -69,7 +69,7 @@
 			params: [numero_pedido]
 		});
 		if (response.ok) {
-			showMessage('Éxito', `Pedido ${numero_pedido} facturado correctamente.`);
+			showMessage('Éxito', `El pedido ${numero_pedido} se está intentando facturar de nuevo.`);
 		} else {
 			showMessage('Error', response.error || `Error al facturar el pedido ${numero_pedido}.`, true);
 		}
